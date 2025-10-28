@@ -1,3 +1,8 @@
+@font-face {
+  font-family: Futura;
+  src: url("/fonts/Futura\ Regular.ttf");
+}
+
 @import "tailwindcss";
 /* index.css — brand scaffold */
 
@@ -61,4 +66,19 @@ html {
 /* Optional — also make sure no scrollbars show up in overflow elements */
 body {
   -ms-overflow-style: none; /* IE and Edge */
+}
+
+.loader-spin {
+  width: 40px;
+  height: 40px;
+  border: 3px solid white;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

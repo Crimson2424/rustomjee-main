@@ -11,6 +11,8 @@ import { GrGallery } from "react-icons/gr";
 import { FloorPlanIcon } from "../components/Icons";
 import { TbStack } from "react-icons/tb";
 import { LuMapPin } from "react-icons/lu";
+import Loader from "../components/Loader";
+import OrientationLock from "../components/OrientationLock";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger, ScrollToPlugin);
 
@@ -21,12 +23,11 @@ const Home = () => {
   const midvidsection = useRef();
   const textRef = useRef(null);
   const midVideoRef = useRef(null);
-  const bottomDiv = useRef()
-  const imageRef = useRef()
-  const bottomAnimateLogo = useRef()
-  const endAnimateLogo = useRef()
+  const bottomDiv = useRef();
+  const imageRef = useRef();
+  const bottomAnimateLogo = useRef();
+  const endAnimateLogo = useRef();
   const [scrollEnabled, setScrollEnabled] = useState(false);
-  
 
   useGSAP(
     () => {
@@ -69,31 +70,31 @@ const Home = () => {
       tl.fromTo(
         logo,
         { opacity: 0 },
-        { opacity: 1, duration: 1, ease: "power1.inOut" }
+        { opacity: 1, duration: 2, delay:1, ease: "power1.inOut" }
       )
         // First text - fade in
         .fromTo(
           text1,
           { opacity: 0 },
-          { opacity: 1, duration: 0.8, ease: "power1.inOut" },
+          { opacity: 1, duration: 1.5, ease: "power1.inOut" },
           "+=0.3"
         )
         // First text - fade out
-        .to(text1, { opacity: 0, duration: 0.8, ease: "power1.inOut" }, "+=1")
+        .to(text1, { opacity: 0, duration: 1.5, ease: "power1.inOut" }, "+=1")
         // Second text - fade in
         .fromTo(
           text2,
           { opacity: 0 },
-          { opacity: 1, duration: 0.8, ease: "power1.inOut" },
+          { opacity: 1, duration: 1.5, ease: "power1.inOut" },
           "+=0.2"
         )
         // Second text - fade out
-        .to(text2, { opacity: 0, duration: 0.8, ease: "power1.inOut" }, "+=1")
+        .to(text2, { opacity: 0, duration: 1.5, ease: "power1.inOut" }, "+=1")
         // Scroll indicator - fade in and stays
         .fromTo(
           scrollIndicator,
           { opacity: 0 },
-          { opacity: 1, duration: 0.8, ease: "power1.inOut" },
+          { opacity: 1, duration: 1.5, ease: "power1.inOut" },
           "+=0.2"
         );
     },
@@ -131,237 +132,297 @@ const Home = () => {
     return () => ctx.revert();
   }, [scrollEnabled]);
 
+  const width = window.innerWidth;
+
+  let scaleValue;
+  let yValue;
+
+  if (width >= 1280) {
+    scaleValue = 1.06;
+    yValue = -90;
+  } else if (width >= 1024) {
+    scaleValue = 1.05;
+    yValue = -75;
+  } else if (width >= 640) {
+    scaleValue = 1.03;
+    yValue = -30;
+  } else {
+    scaleValue = 1.07;
+    yValue = -90;
+  }
+
   useEffect(() => {
-    if (!scrollEnabled || !bottomDiv.current || !bottomAnimateLogo.current || !imageRef.current || !endAnimateLogo.current) return;
-  
+    if (
+      !scrollEnabled ||
+      !bottomDiv.current ||
+      !bottomAnimateLogo.current ||
+      !imageRef.current ||
+      !endAnimateLogo.current
+    )
+      return;
+
     const ctx = gsap.context(() => {
+      // 💡 This prevents the flash
+      gsap.set(bottomAnimateLogo.current.querySelectorAll("*"), {
+        opacity: 0,
+        y: 100,
+        scale: 0.9,
+      });
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: bottomDiv.current,
-          start: "50% 80%",     // timeline starts here
-          end: "bottom bottom",    // timeline ends here
-          scrub: 10,             // scrub entire timeline
-          markers: false,        // for debugging
+          start: "top bottom", // timeline starts here     /for big screen 50% 80%
+          end: "bottom bottom", // timeline ends here
+          scrub: 10, // scrub entire timeline
+          markers: false, // for debugging
         },
       });
-  
-      tl.fromTo(
-         bottomAnimateLogo.current.querySelectorAll("*"),
-        {
-          opacity: 0,
-          y: 100,
-          scale: 0.9,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          ease: "power2.inOut",
-          duration: 4,
-          stagger: 2
-        }
-      )
-      .to(
-         bottomAnimateLogo.current.querySelectorAll("*"),
-        {
-          opacity: 0,
-          ease: "power2.out",
-          duration: 3,
-        },
-        ">0.2" // happens after image scaling
-      )
-      .to(
-        imageRef.current,
-        {
-          scale: 1.05,
-          y:-100,
-          ease: "power2.inOut",
-          duration: 1.5,
-          
-        },
-        ">0.2" // slight delay after logo animates in
-      )
-      .fromTo(endAnimateLogo.current,
-        {
-          opacity:0,
-          yPercent: 100,
-        },
-        {
-          opacity:1,
-          yPercent: 0,
-          ease: "power2.out",
-          duration: 1.5,
-        },
-        ">0.2"
-      )
+
+      tl.to(bottomAnimateLogo.current.querySelectorAll("*"), {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        ease: "power2.inOut",
+        duration: 4,
+        stagger: 2,
+      })
+        .to(
+          bottomAnimateLogo.current.querySelectorAll("*"),
+          {
+            
+            yPercent: -300,
+            ease: "linear",
+            duration: 2,
+            stagger: 2,
+          },
+          ">0.2"
+        )
+        .to(
+          bottomAnimateLogo.current.querySelectorAll("*"),
+          {
+            opacity: 0,
+            ease: "linear",
+            duration: 2,
+            stagger: 2,
+          },
+          "<" // runs at the same time as the previous tween
+        )
+        .to(
+          imageRef.current,
+          {
+            scale: scaleValue,  //1.05
+            y: yValue,  //90
+            ease: "power2.inOut",
+            duration: 1.5,
+          },
+          ">0.2"
+        )
+        .fromTo(
+          endAnimateLogo.current,
+          {
+            opacity: 0,
+            yPercent: 100,
+          },
+          {
+            opacity: 1,
+            yPercent: 0,
+            ease: "power2.out",
+            duration: 1.5,
+          },
+          ">0.2"
+        );
     });
-  
+
     return () => ctx.revert();
   }, [scrollEnabled]);
-  
 
-
-  return (<>
-  {
-    scrollEnabled &&
-    <ReactLenis root options={{duration:3}} />
-  }
-      <div ref={container} className="w-full h-[196vw] overflow-hidden relative ">
-        {/* full body image in background */}
-        <img
-        ref={imageRef}
-          src="images/full-body.jpg"
-          className=" w-screen bg-no-repeat bg-cover bg-center absolute -z-100 origin-[center_150vw]"
-          alt=""
-        />
-        {/* Logo - Fixed within hero section */}
-        <div className="logo absolute top-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+  return (
+    <>
+    <OrientationLock />
+      <Loader>
+        {scrollEnabled && <ReactLenis root options={{ duration: 3 }} />}
+        <div
+          ref={container}
+          className="w-full h-[196vw] overflow-hidden relative "
+        >
+          {/* full body image in background */}
           <img
-            src="/images/logo.svg"
-            alt="Rustomjee"
-            className="h-16 w-auto opacity-0"
+            ref={imageRef}
+            src="images/full-body.jpg"
+            className=" w-screen bg-no-repeat bg-cover bg-center absolute -z-100 origin-[center_150vw]"
+            alt=""
           />
-        </div>
+          {/* Logo - Fixed within hero section */}
+          <div className="logo absolute top-1 xl:top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+            <img
+              src="/images/logo.svg"
+              alt="Rustomjee"
+              className="h-12 xl:h-18 w-auto opacity-0
+          
+            "
+            />
+          </div>
 
-        {/* Sequential Text at Bottom */}
-        <div className="h-screen w-full left-0 top-0 right-0 absolute z-50 select-none">
-          <div className="absolute bottom-0 h-28 left-0 right-0 flex justify-center ">
-            <h1
-              className="text-1 absolute text-3xl md:text-4xl uppercase font-bold text-center px-8 opacity-0"
-              style={{ fontFamily: "Balgin, sans-serif", color: "white" }}
-            >
-              A quiet statement perched above the tides of time.
-            </h1>
-
-            <h1
-              className="text-2 absolute text-3xl md:text-4xl uppercase font-bold text-center px-8 opacity-0"
-              style={{ fontFamily: "Balgin, sans-serif", color: "white" }}
-            >
-              Where the sea tells its secrets
-            </h1>
-
-            <div onClick={()=> {
-               gsap.to(window, {
-                duration: 2,               // how long the scroll should take
-                scrollTo: midvidsection.current,  // can also use {y: targetRef.current, offsetY: 50}
-                ease: "power3.inOut",      // smooth easing
-              });
-            }} className={`scroll-indicator absolute bottom-0 flex flex-col items-center opacity-0 cursor-pointer ${!scrollEnabled && 'pointer-events-none '} `}>
-              <p
-                className="text-3xl md:text-4xl uppercase font-bold mb-1"
+          {/* Sequential Text at Bottom */}
+          <div className="h-screen w-full left-0 top-0 right-0 absolute z-50 select-none">
+            <div className="absolute bottom-0 md:bottom-26 lg:bottom-30 xl:bottom-10 h-20 left-0 right-0 flex justify-center ">
+              <h1
+                className="text-1 absolute text-xl lg:text-2xl  xl:text-4xl uppercase font-bold text-center px-8 opacity-0"
                 style={{ fontFamily: "Balgin, sans-serif", color: "white" }}
               >
-                Scroll
-              </p>
-              <div className="flex flex-col -space-y-3">
-                <svg className="w-10 h-10" fill="white" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <svg className="w-10 h-10" fill="white" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                A quiet statement perched above the tides of time.
+              </h1>
+
+              <h1
+                className="text-2 absolute text-xl lg:text-2xl  xl:text-4xl uppercase font-bold text-center px-8 opacity-0"
+                style={{ fontFamily: "Balgin, sans-serif", color: "white" }}
+              >
+                Where the sea tells its secrets
+              </h1>
+
+              <div
+                onClick={() => {
+                  gsap.to(window, {
+                    duration: 2, // how long the scroll should take
+                    scrollTo: midvidsection.current, // can also use {y: targetRef.current, offsetY: 50}
+                    ease: "power3.inOut", // smooth easing
+                  });
+                }}
+                className={`scroll-indicator absolute bottom-0 flex flex-col md:bottom-0  lg:bottom-0 xl:-bottom-9 items-center opacity-0 cursor-pointer ${
+                  !scrollEnabled && "pointer-events-none "
+                } `}
+              >
+                <p
+                  className="text-2xl lg:text-3xl xl:text-4xl  uppercase font-bold mb-1"
+                  style={{ fontFamily: "Balgin, sans-serif", color: "white" }}
+                >
+                  Scroll
+                </p>
+                <div className="flex flex-col -space-y-3">
+                  <svg
+                    className="w-7 h-7 xl:w-10 xl:h-10"
+                    fill="white"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <svg
+                    className="w-7 h-7 xl:w-10 xl:h-10"
+                    fill="white"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="relative">
-          <div className="bg-gradient-to-b absolute translate-y-full left-0 w-full bottom-0 from-[#C0B8AF] to-transparent h-10 z-10"></div>
-          <video
-            ref={videoRef}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className=" top-0 left-0 w-full object-cover -z-1 "
-          >
-            <source src="/video/beachfinal.mp4" type="video/mp4" />
-          </video>
-
-          {/* //Mid-section */}
-          <div
-            ref={midvidsection}
-            className="overflow-hidden -translate-y-[0.7vw] absolute w-full h-full -z-100 "
-          >
+          <div className="relative ">
+            <div className="bg-gradient-to-b absolute translate-y-full left-0 w-full bottom-0 from-[#C0B8AF] to-transparent h-10 z-10"></div>
             <video
-              ref={midVideoRef}
+              ref={videoRef}
               autoPlay
               loop
               muted
               playsInline
-              className="w-full"
+              className=" top-0 left-0 w-full object-cover -z-1 "
             >
-              <source src="/video/newcenter.mp4" />
+              <source src="/video/beachfinal.mp4" type="video/mp4" />
             </video>
-            {/* Text on Left Side - Vertically Centered */}
-            <div className="absolute left-8 md:left-16 top-1/2 -translate-y-1/2 z-40">
+
+            {/* //Mid-section */}
+            <div
+              ref={midvidsection}
+              className="overflow-hidden -translate-y-[0.7vw] absolute w-full h-full -z-100 "
+            >
+              <video
+                ref={midVideoRef}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full"
+              >
+                <source src="/video/newcenter.mp4" />
+              </video>
+              {/* Text on Left Side - Vertically Centered */}
+              <div className="absolute h-[10vw] left-8 lg:left-15 top-1/2 -translate-y-1/2 z-40">
+                <h1
+                  ref={textRef}
+                  className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl  uppercase font-bold"
+                  style={{
+                    fontFamily: "Balgin, sans-serif",
+                    color: "#1d2938",
+                  }}
+                >
+                  A DREAM
+                  <br />
+                  IN BANDRA
+                </h1>
+              </div>
+            </div>
+
+            <div className="w-full h-fit translate-y-[calc(100%-0.7vw)] absolute bottom-0 z-50 ">
+              <img
+                src="/images/overlay1.png"
+                alt="Overlay Top"
+                className="w-full h-full mask-alpha bg-no-repeat bg-cover"
+              />
+            </div>
+          </div>
+
+          {/* Logo and Text - Center (for intro animation) */}
+          <div
+            ref={bottomDiv}
+            className="w-full h-screen absolute bottom-0 z-500 "
+          >
+            <div
+              ref={bottomAnimateLogo}
+              className="end-logo absolute h-[12vw] sm:h-[22vw] md:h-[20vw] lg:h-[10vw] xl:h-[26vw] lg:top-45 top-8 md:top-35 left-1/2 -translate-x-1/2 -translate-y-1/2  opacity-100 flex flex-col items-center"
+            >
+              <img
+                src="/images/logo.png"
+                alt="Rustomjee"
+                className="h-10 md:h-20 w-auto"
+              />
               <h1
-                ref={textRef}
-                className="text-5xl md:text-6xl uppercase font-bold"
+                className="end-text text-2xl md:text-4xl uppercase font-bold tracking-wider opacity-100"
                 style={{
                   fontFamily: "Balgin, sans-serif",
                   color: "#1d2938",
                 }}
               >
-                A DREAM
-                <br />
-                IN BANDRA
+                CLIFF TOWER
               </h1>
             </div>
-          </div>
 
-          <div className="w-full h-fit translate-y-[calc(100%-0.7vw)] absolute bottom-0 z-50 ">
-            <img
-              src="/images/overlay1.png"
-              alt="Overlay Top"
-              className="w-full h-full mask-alpha bg-no-repeat bg-cover"
-            />
-          </div>
-        </div>
-        
-
-
-        {/* Logo and Text - Center (for intro animation) */}
-        <div ref={bottomDiv} className="w-full h-screen absolute bottom-0 z-500 ">
-          
-          <div  ref={bottomAnimateLogo}  className="end-logo absolute top-15 left-1/2 -translate-x-1/2 -translate-y-1/2  opacity-100 flex flex-col items-center">
-            <img
-              src="/images/logo.png"
-              alt="Rustomjee"
-              className="h-20 md:h-24 w-auto mb-4"
-            />
-            <h1
-              className="end-text text-4xl md:text-5xl uppercase font-bold tracking-wider opacity-100"
-              style={{
-                fontFamily: "Balgin, sans-serif",
-                color: "#1d2938",
-              }}
+            {/* Logo and Text - Top (appears after zoom) */}
+            <div
+              ref={endAnimateLogo}
+              className="end-top-logo  absolute bottom-[1vw] left-1/2 -translate-x-1/2 z-50 opacity-0 flex gap-5 items-center p-2 py-2 xl:p-4 rounded-xs bg-white text-gray-500"
             >
-              CLIFF TOWER
-            </h1>
-          </div>
-
-          {/* Logo and Text - Top (appears after zoom) */}
-          <div ref={endAnimateLogo} className="end-top-logo absolute bottom-[1vw] left-1/2 -translate-x-1/2 z-50 opacity-0 flex gap-8 items-center p-3 py-6 rounded-xs bg-white text-gray-500">
-          <IoHomeOutline size={40} />
-          <MdOutlineInventory size={40} />
-          <MdOutline360 size={40} />
-          <GrGallery size={40}/>
-          <FloorPlanIcon className={' text-gray-500'} size={40} />
-          <TbStack size={40} />
-          <LuMapPin size={40}/>
+              <IoHomeOutline className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
+              <MdOutlineInventory className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
+              <MdOutline360 className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
+              <GrGallery className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
+              <FloorPlanIcon className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all h-5 xl:h-7" />
+              <TbStack className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
+              <LuMapPin className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
+            </div>
           </div>
         </div>
-      </div>
-      </>
+      </Loader>
+    </>
   );
 };
 
