@@ -1,15 +1,44 @@
 // Inventory.jsx
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { data } from "../constants/data";
 import FloorComparisonPanel from "../components/FloorComparisonPanel";
+import NavigationBar from "../components/Nav";
+import Loader from "../components/Loader";
 
 export default function Inventory() {
   const [layers] = useState(data);
   const [selectedLayer, setSelectedLayer] = useState(null);
   const [hoveredLayer, setHoveredLayer] = useState(null);
+  const [floorCentroids, setFloorCentroids] = useState({});
   const [showComparison, setShowComparison] = useState(false);
   const [lockedFloor, setLockedFloor] = useState(null);
   const svgRef = useRef(null);
+
+  // Calculate centroid of each floor path
+  useEffect(() => {
+    const centroids = {};
+    
+    layers.forEach(layer => {
+      if (layer.d && layer.floorNumber) {
+        // Parse the path data to get coordinates
+        const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        pathElement.setAttribute("d", layer.d);
+        
+        try {
+          const bbox = pathElement.getBBox();
+          centroids[layer.path_id] = {
+            x: bbox.x + bbox.width / 2,
+            y: bbox.y + bbox.height / 2,
+            floorNumber: layer.floorNumber
+          };
+        } catch (e) {
+          console.warn(`Could not calculate centroid for ${layer.path_id}`);
+        }
+      }
+    });
+    
+    setFloorCentroids(centroids);
+  }, [layers]);
 
   const getClassColor = useCallback((layer) => {
     const classColors = {
@@ -44,11 +73,8 @@ export default function Inventory() {
     setHoveredLayer(null);
   }, []);
 
-  // ✅ UPDATED: Directly open comparison panel for highlighted floors
   const handleLayerClick = useCallback((layer) => {
-    // Check if it's a highlighted floor (cls-1, cls-2, or cls-3)
     if (['cls-1', 'cls-2', 'cls-3'].includes(layer.class)) {
-      // Convert layer to floor format
       const floor = {
         id: layer.path_id,
         d: layer.d,
@@ -61,12 +87,10 @@ export default function Inventory() {
         }
       };
       
-      // Set as locked floor and open comparison
       setLockedFloor(floor);
       setShowComparison(true);
     }
     
-    // Toggle selection for visual feedback
     setSelectedLayer(prev => prev === layer.path_id ? null : layer.path_id);
   }, []);
 
@@ -76,6 +100,8 @@ export default function Inventory() {
   }, []);
 
   return (
+    <>
+    <Loader>
     <div className="fixed inset-0 w-full h-full overflow-hidden bg-[#dedbd4]">
       {/* Logo */}
       <div className="fixed top-4 right-10 z-40">
@@ -97,7 +123,7 @@ export default function Inventory() {
           style={{ shapeRendering: 'optimizeSpeed', pointerEvents: 'auto' }}
         >
           <image
-            href="/images/building.webp"
+            href="/images/3.3.1.jpg"
             x="0"
             y="0"
             width="6826"
@@ -124,11 +150,48 @@ export default function Inventory() {
                 onClick={() => handleLayerClick(layer)}
               />
             ))}
+
+            {/* Glowing Floor Numbers - Only show on hover */}
+            {hoveredLayer && floorCentroids[hoveredLayer] && (
+              <g>
+                <text
+                  x={floorCentroids[hoveredLayer].x}
+                  y={floorCentroids[hoveredLayer].y}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  className="floor-number-glow"
+                  style={{
+                    fontSize: '120px',
+                    fontWeight: 'bold',
+                    fill: '#3b4b9f',
+                    filter: 'url(#blue-glow)',
+                    pointerEvents: 'none',
+                    fontFamily: 'Arial, sans-serif'
+                  }}
+                >
+                  {floorCentroids[hoveredLayer].floorNumber}
+                </text>
+              </g>
+            )}
           </g>
+
+          {/* SVG Filter for Blue Glow Effect */}
+          <defs>
+            <filter id="blue-glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="10" result="coloredBlur"/>
+              <feFlood floodColor="#3b4b9f" floodOpacity="0.8"/>
+              <feComposite in2="coloredBlur" operator="in"/>
+              <feMerge>
+                <feMergeNode/>
+                <feMergeNode/>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
         </svg>
       </div>
 
-      {/* Comparison Panel */}
       {showComparison && (
         <FloorComparisonPanel
           show={showComparison}
@@ -137,6 +200,9 @@ export default function Inventory() {
           lockedFloor={lockedFloor}
         />
       )}
+      <NavigationBar className="!opacity-100" />
     </div>
+    </Loader>
+    </>
   );
 }

@@ -13,6 +13,7 @@ import { TbStack } from "react-icons/tb";
 import { LuMapPin } from "react-icons/lu";
 import Loader from "../components/Loader";
 import OrientationLock from "../components/OrientationLock";
+import NavigationBar from "../components/Nav";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger, ScrollToPlugin);
 
@@ -407,18 +408,7 @@ const Home = () => {
             </div>
 
             {/* Logo and Text - Top (appears after zoom) */}
-            <div
-              ref={endAnimateLogo}
-              className="end-top-logo  absolute bottom-[1vw] left-1/2 -translate-x-1/2 z-50 opacity-0 flex gap-5 items-center p-2 py-2 xl:p-4 rounded-xs bg-white text-gray-500"
-            >
-              <IoHomeOutline className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
-              <MdOutlineInventory className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
-              <MdOutline360 className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
-              <GrGallery className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
-              <FloorPlanIcon className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all h-5 xl:h-7" />
-              <TbStack className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
-              <LuMapPin className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
-            </div>
+            <NavigationBar ref={endAnimateLogo}/>
           </div>
         </div>
       </Loader>
