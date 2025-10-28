@@ -337,7 +337,7 @@ const Home = () => {
               playsInline
               className=" top-0 left-0 w-full object-cover -z-1 "
             >
-              <source src="/video/beachfinal.mp4" type="video/mp4" />
+              <source src="/video/beachfinal2.mp4" type="video/mp4" />
             </video>
 
             {/* //Mid-section */}
@@ -353,7 +353,7 @@ const Home = () => {
                 playsInline
                 className="w-full"
               >
-                <source src="/video/newcenter.mp4" />
+                <source src="/video/newcenter2.mp4" />
               </video>
               {/* Text on Left Side - Vertically Centered */}
               <div className="absolute h-[10vw] left-8 lg:left-15 top-1/2 -translate-y-1/2 z-40">
