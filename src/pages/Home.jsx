@@ -70,7 +70,7 @@ const Home = () => {
       tl.fromTo(
         logo,
         { opacity: 0 },
-        { opacity: 1, duration: 2, delay:1, ease: "power1.inOut" }
+        { opacity: 1, duration: 2, delay: 1, ease: "power1.inOut" }
       )
         // First text - fade in
         .fromTo(
@@ -80,7 +80,11 @@ const Home = () => {
           "+=0.3"
         )
         // First text - fade out
-        .to(text1, { opacity: 0, duration: 1.5, ease: "power1.inOut" }, "+=1")
+        .to(
+          text1,
+          { opacity: 0, duration: 1.5, delay: 1, ease: "power1.inOut" },
+          "+=1"
+        )
         // Second text - fade in
         .fromTo(
           text2,
@@ -89,7 +93,11 @@ const Home = () => {
           "+=0.2"
         )
         // Second text - fade out
-        .to(text2, { opacity: 0, duration: 1.5, ease: "power1.inOut" }, "+=1")
+        .to(
+          text2,
+          { opacity: 0, duration: 1.5, delay: 1, ease: "power1.inOut" },
+          "+=1"
+        )
         // Scroll indicator - fade in and stays
         .fromTo(
           scrollIndicator,
@@ -138,14 +146,14 @@ const Home = () => {
   let yValue;
 
   if (width >= 1280) {
-    scaleValue = 1.06;
-    yValue = -90;
+    scaleValue = 1.04;
+    yValue = -175;
   } else if (width >= 1024) {
     scaleValue = 1.05;
     yValue = -75;
   } else if (width >= 640) {
     scaleValue = 1.03;
-    yValue = -30;
+    yValue = -96;
   } else {
     scaleValue = 1.07;
     yValue = -90;
@@ -190,7 +198,6 @@ const Home = () => {
         .to(
           bottomAnimateLogo.current.querySelectorAll("*"),
           {
-            
             yPercent: -300,
             ease: "linear",
             duration: 2,
@@ -211,8 +218,8 @@ const Home = () => {
         .to(
           imageRef.current,
           {
-            scale: scaleValue,  //1.05
-            y: yValue,  //90
+            scale: scaleValue, //1.05
+            y: yValue, //90
             ease: "power2.inOut",
             duration: 1.5,
           },
@@ -239,7 +246,7 @@ const Home = () => {
 
   return (
     <>
-    <OrientationLock />
+      <OrientationLock />
       <Loader>
         {scrollEnabled && <ReactLenis root options={{ duration: 3 }} />}
         <div
@@ -289,19 +296,19 @@ const Home = () => {
                     ease: "power3.inOut", // smooth easing
                   });
                 }}
-                className={`scroll-indicator absolute bottom-0 flex flex-col md:bottom-0  lg:bottom-0 xl:-bottom-9 items-center opacity-0 cursor-pointer ${
+                className={`scroll-indicator absolute bottom-0 flex flex-col md:bottom-0 lg:bottom-0 xl:-bottom-9 items-center opacity-0 cursor-pointer ${
                   !scrollEnabled && "pointer-events-none "
                 } `}
               >
                 <p
-                  className="text-2xl lg:text-3xl xl:text-4xl  uppercase font-bold mb-1"
+                  className="text-2xl lg:text-3xl xl:text-4xl -mb-2 uppercase font-bold"
                   style={{ fontFamily: "Balgin, sans-serif", color: "white" }}
                 >
                   Scroll
                 </p>
-                <div className="flex flex-col -space-y-3">
+                <div className="flex flex-col -space-y-5">
                   <svg
-                    className="w-7 h-7 xl:w-10 xl:h-10"
+                    className="w-7 h-7 xl:w-8 xl:h-8"
                     fill="white"
                     viewBox="0 0 20 20"
                   >
@@ -312,7 +319,7 @@ const Home = () => {
                     />
                   </svg>
                   <svg
-                    className="w-7 h-7 xl:w-10 xl:h-10"
+                    className="w-7 h-7 xl:w-8 xl:h-8"
                     fill="white"
                     viewBox="0 0 20 20"
                   >
@@ -359,7 +366,7 @@ const Home = () => {
               <div className="absolute h-[10vw] left-8 lg:left-15 top-1/2 -translate-y-1/2 z-40">
                 <h1
                   ref={textRef}
-                  className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl  uppercase font-bold"
+                  className="text-2xl sm:text-3xl md:text-5xl lg:text-5xl  uppercase font-bold"
                   style={{
                     fontFamily: "Balgin, sans-serif",
                     color: "#1d2938",
@@ -388,7 +395,7 @@ const Home = () => {
           >
             <div
               ref={bottomAnimateLogo}
-              className="end-logo absolute h-[12vw] sm:h-[22vw] md:h-[20vw] lg:h-[10vw] xl:h-[26vw] lg:top-45 top-8 md:top-35 left-1/2 -translate-x-1/2 -translate-y-1/2  opacity-100 flex flex-col items-center"
+              className="end-logo absolute h-[12vw] sm:h-[22vw] md:h-[20vw] xs:hidden lg:h-[10vw] xl:h-[26vw] lg:top-45 top-8 md:top-35 left-1/2 -translate-x-1/2 -translate-y-1/2  opacity-100 flex flex-col items-center"
             >
               <img
                 src="/images/logo.png"
@@ -409,15 +416,15 @@ const Home = () => {
             {/* Logo and Text - Top (appears after zoom) */}
             <div
               ref={endAnimateLogo}
-              className="end-top-logo  absolute bottom-[1vw] left-1/2 -translate-x-1/2 z-50 opacity-0 flex gap-5 items-center p-2 py-2 xl:p-4 rounded-xs bg-white text-gray-500"
+              className="end-top-logo  absolute bottom-[0.3vw] left-1/2 -translate-x-1/2 z-50 opacity-0 flex gap-5 items-center p-2 py-2 xl:p-4 xl:gap-15 xl:px-6 rounded-xs bg-white text-gray-500"
             >
-              <IoHomeOutline className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
-              <MdOutlineInventory className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
-              <MdOutline360 className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
-              <GrGallery className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
-              <FloorPlanIcon className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all h-5 xl:h-7" />
-              <TbStack className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
-              <LuMapPin className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
+              <IoHomeOutline title="Home" className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
+              <MdOutlineInventory title="Features" className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
+              <MdOutline360 title="Drone views" className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
+              <GrGallery strokeWidth={0} title="Gallery" className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl font-extralight" />
+              <FloorPlanIcon title="Floor Plan" className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all h-5 xl:h-7" />
+              
+              <LuMapPin title="Map" className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl" />
             </div>
           </div>
         </div>
