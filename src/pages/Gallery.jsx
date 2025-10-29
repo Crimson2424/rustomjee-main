@@ -1,9 +1,11 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { CustomEase } from 'gsap/CustomEase';
 import { useGSAP } from '@gsap/react';
 import { ImageContainer } from '../components/ImageContainer';
 import { slidesData } from '../constants/data';
+import Loader from '../components/Loader';
 
 // Register plugins
 gsap.registerPlugin(useGSAP, CustomEase);
@@ -19,6 +21,7 @@ export default function StorySlider({
   duration = 2.0,
   throttleDelay = 500
 }) {
+  const navigate = useNavigate();
   const containerRef = useRef();
   const animatingRef = useRef(false);
   const [currentCategory, setCurrentCategory] = useState('amenities');
@@ -34,6 +37,33 @@ export default function StorySlider({
   // Accumulated delta for touchpad
   const accumulatedDelta = useRef(0);
   const SCROLL_THRESHOLD = 100;
+
+  // ✅ Add useEffect to control overflow locally
+  useEffect(() => {
+    // Store original values
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    const originalBodyHeight = document.body.style.height;
+    const originalHtmlHeight = document.documentElement.style.height;
+
+    // Apply slider-specific styles
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.height = '100vh';
+    document.documentElement.style.height = '100vh';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+      document.body.style.height = originalBodyHeight;
+      document.documentElement.style.height = originalHtmlHeight;
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, []);
 
   // Calculate category boundaries
   const categorySlideCount = slides.reduce((acc, slide) => {
@@ -265,7 +295,6 @@ export default function StorySlider({
   );
 
   const handleTouchStart = (e) => {
-    // Allow all touches to work for swiping
     touchStartY.current = e.touches[0].clientY;
     touchStartX.current = e.touches[0].clientX;
   };
@@ -281,7 +310,6 @@ export default function StorySlider({
     const deltaY = touchStartY.current - touchEndY.current;
     const deltaX = touchStartX.current - touchEndX.current;
     
-    // Only trigger if it's a vertical swipe (not horizontal)
     if (Math.abs(deltaY) > Math.abs(deltaX)) {
       if (deltaY > minSwipeDistance) {
         if (window.handleSliderNext) {
@@ -417,6 +445,10 @@ export default function StorySlider({
             src={slide.src}
             alt={`Slide ${slide.id}`}
             className="absolute top-0 left-0 w-full h-full object-cover will-change-transform"
+            style={{ 
+              pointerEvents: 'none',
+              userSelect: 'none'
+            }}
           />
         )}
       </div>
@@ -424,15 +456,43 @@ export default function StorySlider({
   };
 
   return (
+    <>
+    <Loader>
     <div 
       ref={containerRef} 
-      className="relative w-screen h-screen bg-black overflow-hidden"
+      className="fixed inset-0 w-screen h-screen bg-black overflow-hidden"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      style={{ 
+        overscrollBehavior: 'none',
+        overscrollBehaviorY: 'none',
+        touchAction: 'none'
+      }}
     >
-      <div className='fixed top-2 left-2 z-50 flex justify-end items-end p-4'>
-        <a href="/"><img src="/images/logo.svg" alt="Rustomjee" className="h-12 w-auto"/></a>
+      {/* Close Button - Top Left */}
+      <button
+        onClick={() => navigate('/')}
+        className="fixed top-4 left-4 z-50 w-12 h-12 flex items-center justify-center bg-black/40 backdrop-blur-sm hover:bg-[#1d2938] rounded-full transition-all duration-300 cursor-pointer group"
+      >
+        <svg 
+          className="w-6 h-6 text-white group-hover:scale-110 transition-transform"
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            strokeWidth={2} 
+            d="M6 18L18 6M6 6l12 12" 
+          />
+        </svg>
+      </button>
+
+      {/* Logo - Top Right */}
+      <div className='fixed top-4 right-4 z-50 flex justify-end items-end'>
+        <img src="/images/logo.svg" alt="Rustomjee" className="h-12 w-auto"/>
       </div>
 
       <div className="slider absolute top-0 left-0 w-full h-full overflow-hidden">
@@ -448,41 +508,7 @@ export default function StorySlider({
         ))}
 
         <div className='bottom-6 w-[90%] sm:w-[50%] px-4 sm:px-12 absolute left-1/2 -translate-x-1/2 z-50'>
-          <div className='grid grid-cols-3 gap-2 sm:gap-6 mb-4'>
-            <button 
-              onClick={() => jumpToCategory('amenities')}
-              className={`bg-transparent uppercase border-none cursor-pointer text-sm sm:text-xl text-white touch-manipulation ${currentCategory === 'amenities' ? 'font-bold' : ''}`}
-            >
-              Amenities
-            </button>
-            <button 
-              onClick={() => jumpToCategory('apartment')}
-              className={`bg-transparent uppercase border-none cursor-pointer text-sm sm:text-xl text-white touch-manipulation ${currentCategory === 'apartment' ? 'font-bold' : ''}`}
-            >
-              Apartment
-            </button>
-            <button 
-              onClick={() => jumpToCategory('exterior')}
-              className={`bg-transparent uppercase border-none cursor-pointer text-sm sm:text-xl text-white touch-manipulation ${currentCategory === 'exterior' ? 'font-bold' : ''}`}
-            >
-              Exterior
-            </button>
-          </div>
-
           <div className='relative w-full h-1 bg-white/30 rounded-none overflow-hidden opacity-50'>
-            <div 
-              className='absolute top-0 h-full w-[2px] bg-white/60 z-10'
-              style={{ left: '0%' }}
-            />
-            <div 
-              className='absolute top-0 h-full w-[2px] bg-white/60 z-10'
-              style={{ left: `${amenitiesWidth}%` }}
-            />
-            <div 
-              className='absolute top-0 h-full w-[2px] bg-white/60 z-10'
-              style={{ left: `${amenitiesWidth + apartmentWidth}%` }}
-            />
-            
             <div 
               className='h-full bg-white transition-all duration-300 ease-out rounded-none'
               style={{ width: `${overallProgress}%` }}
@@ -490,6 +516,9 @@ export default function StorySlider({
           </div>
         </div>
       </div>
+      
     </div>
+    </Loader>
+    </>
   );
 }

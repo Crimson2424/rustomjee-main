@@ -1,6 +1,6 @@
 export const data = [
  
-  { "layer_id": "Layer_25", "layer_name": "Layer 25", "class": "cls-9", "d": "m 2107.62,3335 -680.2,185.31 c 0,0 -6.07,6.87 -25.51,0.6 l -281.25,-30.91 c 0,0 -15.81,2.93 -26.77,-12.92 l -83.61,-146.48 v 71.15 l -1.11,3.13 86.67,166.11 c 0,0 5.67,14.87 28.37,17.41 22.7,2.54 271.17,28.57 271.17,28.57 0,0 33.85,2.93 45,-3.52 l 667.23,-195.46 c 0,0 4.25,-5.28 -2.21,-10.57 l 0.59,-65.54 c 0,0 4.61,0.51 1.62,-6.89 z", "path_id": "path2" }, 
+  {"layer_id": "Layer_25", "layer_name": "Layer 25", "class": "cls-9", "d": "m 2107.62,3335 -680.2,185.31 c 0,0 -6.07,6.87 -25.51,0.6 l -281.25,-30.91 c 0,0 -15.81,2.93 -26.77,-12.92 l -83.61,-146.48 v 71.15 l -1.11,3.13 86.67,166.11 c 0,0 5.67,14.87 28.37,17.41 22.7,2.54 271.17,28.57 271.17,28.57 0,0 33.85,2.93 45,-3.52 l 667.23,-195.46 c 0,0 4.25,-5.28 -2.21,-10.57 l 0.59,-65.54 c 0,0 4.61,0.51 1.62,-6.89 z", "path_id": "path2" }, 
   { "layer_id": "Layer_26", "layer_name": "Layer 26", "class": "cls-9", "d": "m 2106.56,3415 -667.39,195.77 c 0,0 -2.56,6.27 -34.2,3.43 l -285.94,-29.95 c 0,0 -14.12,-2.43 -22.18,-14.58 l -87.68,-168.09 v 6.85 l 2.15,6.07 1.37,60.85 c 0,0 -6.46,1.57 -2.15,6.65 l 80.61,171.59 c 0,0 4.3,20.15 35.22,21.33 l 269.41,29.54 c 0,0 29.35,5.87 72,-13.3 l 637.63,-197.61 c 0,0 3.44,-1.57 3.58,-4.11 0.14,-2.54 -2.21,-7.43 -4.17,-7.43 -1.96,0 0.78,-62.41 0.78,-62.41 0,0 3.53,-3.31 3.38,-5.48 -0.15,-2.17 -2.43,0.9 -2.43,0.9 z", "path_id": "path3" }, 
   { "layer_id": "Layer_27", "layer_name": "Layer 27", "class": "cls-9", "d": "m 2108.18,3500 c 0,0 2.77,7.02 0,7.81 -2.77,0.79 -1.98,63 -1.98,63 0,0 6.77,12.52 2.8,13.7 -3.97,1.18 -672.71,228.13 -672.71,228.13 0,0 -11.74,6.26 -55.96,0 -44.22,-6.26 -257.87,-30.13 -257.87,-30.13 0,0 -17.61,2.35 -27.78,-18.78 -10.17,-21.13 -85.5,-193.7 -85.5,-193.7 l 1.37,-79.43 81.7,174.6 c 0,0 7.11,15.35 34.13,18.31 27.02,2.96 269.41,29.54 269.41,29.54 0,0 21.71,3.77 52.43,-5.84 30.72,-9.61 281.57,-88.66 281.57,-88.66 l 378.39,-118.54 z", "path_id": "path4" }, 
   { "layer_id": "Layer_28", "layer_name": "Layer 28", "class": "cls-9", "d": "m 2108.99,3575 -2.8,3.91 v 59.87 c 0,0 8.28,8.22 1.4,12.13 -6.88,3.91 -667.4,250.43 -667.4,250.43 0,0 -10.57,7.43 -51.26,2.35 -40.69,-5.08 -264.91,-32.48 -264.91,-32.48 0,0 -21.52,2.74 -31.7,-23.48 -10.18,-26.22 -83.15,-210.91 -83.15,-210.91 v -76.3 l 85.5,193.7 c 0,0 10.76,20.99 34.14,19.49 l 268.73,32.2 c 0,0 23.68,4.85 49.4,-6.4 z", "path_id": "path5" }, 
@@ -28,90 +28,67 @@ export const data = [
   { "layer_id": "Layer_24", "layer_name": "Layer 24", "class": "cls-2", "d": "m 2109.81,3170 -127.51,35 c 0,0 -17.1,4.85 -23.89,0.61 l -56.15,2.35 -24.65,22.3 -72,-4.5 -30.84,25.46 -164.87,32.23 -71.51,-1.73 v -7.83 c 0,0 -31.28,14.58 -65.98,10.81 l -295.81,-19.28 c 0,0 -30.4,-1.84 -28.77,-12.08 l -68.48,-4.5 -64.37,-85.7 -20.54,-3.33 19.89,6.59 -6.26,4.43 8.61,3.13 0.52,29.22 -6.78,9.39 0.26,22.7 -10.46,18.67 0.64,7.25 81.38,128.22 c 0,0 7.56,17.85 26.52,19.16 l 288.79,22.95 h 39.14 l 118.72,-28.68 61.57,3.65 494.48,-124.4 c 0,0 13.06,-3.25 11.67,-11.34 l -23.05,-10.17 -2.61,0.52 -13.57,-0.78 -0.52,-10.96 4.17,-4.7 -4.7,-2.09 0.26,-63.91 26.71,-8.67 z", "path_id": "path27" } 
 ];
 export const slidesData = [
-  { id: 1, src: '/images/1.1.jpg', category: 'amenities' },
-  { id: 2, src: '/images/gym_d.png', revealImage: '/images/gym_n.png', category: 'amenities' },
-  { id: 3, src: '/images/1.2.jpg', category: 'amenities'},
-  { id: 4, src: '/images/1.3.jpg', category: 'amenities' },
-  { id: 5, src: '/images/1.4.jpg', category: 'amenities' },
-  { id: 6, src: '/images/1.5.jpg', category: 'amenities' },
-  { id: 7, src: '/images/1.6.jpg', category: 'amenities' },
-  { 
-    id: 8, 
-    src: '/images/1.7.jpg', 
-    category: 'amenities',
-    isPortrait: true,
-    heading: 'Fitness & Wellness',
-    text: 'State-of-the-art fitness center equipped with modern equipment and dedicated spaces for yoga and meditation. Transform your lifestyle with premium wellness facilities.',
-    subtext: 'Available 24/7 with professional trainers on call.'
-  },
-  { id: 9, src: '/images/1.8.jpg', category: 'amenities' },
-  { 
-    id: 10, 
-    src: '/images/1.9.jpg', 
-    category: 'amenities',
-    isPortrait: true,
-    heading: 'Resort-Style Living',
-    text: 'Indulge in luxury amenities including infinity pools, landscaped gardens, and entertainment zones. Experience vacation-like living every single day.',
-    subtext: 'Your personal resort, right at home.'
-  },
-  { id: 11, src: '/images/2.1.jpg', category: 'apartment' },
-  { id: 12, src: '/images/2.2.jpg', category: 'apartment' },
-  { id: 13, src: '/images/2.3.jpg', revealImage: '/images/2.4.jpg', category: 'apartment' },
-  { 
-    id: 14, 
-    src: '/images/2.5.jpg', 
-    category: 'apartment',
-    isPortrait: true,
-    heading: 'Modern Interiors',
-    text: 'Spacious apartments with contemporary design, premium finishes, and abundant natural light. Every corner reflects sophistication and comfort.',
-    subtext: 'Thoughtfully designed for modern families.'
-  },
-  { 
-    id: 15, 
-    src: '/images/2.6.jpg', 
-    category: 'apartment',
-    isPortrait: true,
-    heading: 'Kitchen Perfection',
-    text: 'Chef-inspired kitchens with modular cabinets, granite countertops, and high-end appliances. Cooking becomes a delightful experience.',
-    subtext: 'Where culinary dreams come true.'
-  },
-  { 
-    id: 16, 
-    src: '/images/2.7.jpg', 
-    category: 'apartment',
-    isPortrait: true,
-    heading: 'Bedroom Serenity',
-    text: 'Luxurious bedrooms with walk-in wardrobes and ensuite bathrooms. Wake up to stunning views and ultimate privacy.',
-    subtext: 'Your personal sanctuary of peace.'
-  },
-  { id: 17, src: '/images/3.1.jpg', category: 'exterior' },
-  { id: 18, src: '/images/3.2.jpg', category: 'exterior' },
-  { 
-    id: 19, 
-    src: '/images/3.3.jpg',
-    revealImage: '/images/3.4.jpg', 
-    category: 'exterior',
-    isPortrait: true,
-    heading: 'Iconic Architecture',
-    text: 'Contemporary design meets timeless elegance in our stunning facade. A landmark structure that redefines luxury living.',
-    subtext: 'Designed by award-winning architects.'
-  },
-  { 
-    id: 20, 
-    src: '/images/3.5.jpg', 
-    category: 'exterior',
-    isPortrait: true,
-    heading: 'Grand Entrance',
-    text: 'Impressive entrance lobby with double-height ceilings, premium materials, and 24/7 concierge service. First impressions that last forever.',
-    subtext: 'Where luxury welcomes you home.'
-  },
   { 
     id: 21, 
-    src: '/images/3.6.jpg', 
-    category: 'exterior',
-    isPortrait: true,
-    heading: 'Panoramic Views',
-    text: 'Floor-to-ceiling windows offering breathtaking city skyline views. Every angle is a picture-perfect moment.',
-    subtext: 'Living above it all.'
+    src: '/images/3.6.1.jpg', 
+    category: 'exterior'
+  },{ id: 18, src: '/images/3.2.jpg', category: 'exterior' }, 
+  { id: 1, src: '/images/1.1.jpg', category: 'amenities' }, { 
+    id: 8, 
+    src: '/images/1.7.1.jpg', 
+    category: 'amenities',
+    
+  },{ id: 7, src: '/images/1.6.jpg', category: 'amenities' },{ id: 5, src: '/images/1.4.jpg', category: 'amenities' },
+  { 
+    id: 10, 
+    src: '/images/1.9.1.jpg', 
+    category: 'amenities',
+  
+  },{ id: 3, src: '/images/1.2.jpg', category: 'amenities'},{ id: 4, src: '/images/1.3.jpg', category: 'amenities' },{ id: 6, src: '/images/1.5.jpg', category: 'amenities' }, { id: 11, src: '/images/2.1.jpg', category: 'apartment' },
+  { 
+    id: 16, 
+    src: '/images/2.7.1.jpg', 
+    category: 'apartment',
+   
+  },{ id: 12, src: '/images/2.2.jpg', category: 'apartment' },{ 
+    id: 14, 
+    src: '/images/2.5.1.jpg', 
+    category: 'apartment',
+   
   },
+ { id: 9, src: '/images/1.8.jpg', category: 'amenities' },{ id: 17, src: '/images/3.1.jpg', category: 'exterior' },
+  { id: 2, revealImage: '/images/gym_d.png',src: '/images/gym_n.png', category: 'amenities' },
+  
+  
+  
+  
+ 
+  
+  
+ 
+  
+  { id: 13, revealImage: '/images/2.3.jpg', src: '/images/2.4.jpg', category: 'apartment' },
+  
+  { 
+    id: 15, 
+    src: '/images/2.6.1.jpg', 
+    category: 'apartment',
+   
+  },
+  
+  
+
+  { 
+    id: 20, 
+    src: '/images/3.5.1.jpg', 
+    category: 'exterior',
+   
+  },  { 
+    id: 19, 
+    revealImage: '/images/3.3.1.jpg',
+    src: '/images/3.4.1.jpg', 
+    category: 'exterior',
+   
+  },
+  
 ];
