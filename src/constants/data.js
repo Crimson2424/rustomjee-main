@@ -32,31 +32,31 @@ export const slidesData = [
     id: 21, 
     src: '/images/3.6.1.jpg', 
     category: 'exterior'
-  },{ id: 18, src: '/images/3.2.jpg', category: 'exterior' }, 
-  { id: 1, src: '/images/1.1.jpg', category: 'amenities' }, { 
+  },{ id: 18, src: '/images/3.2.1.jpg', category: 'exterior' }, 
+  { id: 1, src: '/images/1.1.1.jpg', category: 'amenities' }, { 
     id: 8, 
     src: '/images/1.7.1.jpg', 
     category: 'amenities',
     
-  },{ id: 7, src: '/images/1.6.jpg', category: 'amenities' },{ id: 5, src: '/images/1.4.jpg', category: 'amenities' },
+  },{ id: 7, src: '/images/1.6.1.jpg', category: 'amenities' },{ id: 5, src: '/images/1.4.1.jpg', category: 'amenities' },
   { 
     id: 10, 
     src: '/images/1.9.1.jpg', 
     category: 'amenities',
   
-  },{ id: 3, src: '/images/1.2.jpg', category: 'amenities'},{ id: 4, src: '/images/1.3.jpg', category: 'amenities' },{ id: 6, src: '/images/1.5.jpg', category: 'amenities' }, { id: 11, src: '/images/2.1.jpg', category: 'apartment' },
+  },{ id: 3, src: '/images/1.2.1.jpg', category: 'amenities'},{ id: 4, src: '/images/1.3.1.jpg', category: 'amenities' },{ id: 6, src: '/images/1.5.1.jpg', category: 'amenities' }, { id: 11, src: '/images/2.1.1.jpg', category: 'apartment' },
   { 
     id: 16, 
     src: '/images/2.7.1.jpg', 
     category: 'apartment',
    
-  },{ id: 12, src: '/images/2.2.jpg', category: 'apartment' },{ 
+  },{ id: 12, src: '/images/2.2.1.jpg', category: 'apartment' },{ 
     id: 14, 
     src: '/images/2.5.1.jpg', 
     category: 'apartment',
    
   },
- { id: 9, src: '/images/1.8.jpg', category: 'amenities' },{ id: 17, src: '/images/3.1.jpg', category: 'exterior' },
+ { id: 9, src: '/images/1.8.1.jpg', category: 'amenities' },{ id: 17, src: '/images/3.1.1.jpg', category: 'exterior' },
   { id: 2, revealImage: '/images/gym_d.png',src: '/images/gym_n.png', category: 'amenities' },
   
   

@@ -396,64 +396,28 @@ export default function StorySlider({
   });
 
   const renderSlideContent = (slide) => {
-    if (slide.isPortrait) {
-      return (
-        <div className="slide-content absolute top-0 left-0 w-full h-full flex flex-col md:flex-row">
-          <div className="w-full md:w-1/2 h-1/2 md:h-full relative bg-black flex items-center justify-center">
-            {slide.revealImage ? (
-              <ImageContainer 
-                baseImage={slide.src} 
-                revealImage={slide.revealImage} 
-              />
-            ) : (
-              <img
-                src={slide.src}
-                alt={`Slide ${slide.id}`}
-                className="h-full w-auto object-contain"
-              />
-            )}
-          </div>
+  return (
+    <div className="slide-content absolute top-0 left-0 w-full h-full bg-black flex items-center justify-center">
+      {slide.revealImage ? (
+        <ImageContainer 
+          baseImage={slide.src} 
+          revealImage={slide.revealImage} 
+        />
+      ) : (
+        <img
+          src={slide.src}
+          alt={`Slide ${slide.id}`}
+          className="max-w-full max-h-full object-contain"
+          style={{ 
+            pointerEvents: 'none',
+            userSelect: 'none'
+          }}
+        />
+      )}
+    </div>
+  );
+};
 
-          <div className="w-full md:w-1/2 h-1/2 md:h-full bg-black flex items-center justify-center p-8 md:p-12">
-            <div className="max-w-md">
-              <h2 className="text-heading text-3xl md:text-5xl font-bold text-white mb-4 md:mb-6 opacity-0">
-                {slide.heading || 'Elegant Spaces'}
-              </h2>
-              <p className="text-body text-base md:text-lg text-white leading-relaxed mb-4 opacity-0">
-                {slide.text || 'Experience luxury living with thoughtfully designed interiors.'}
-              </p>
-              {slide.subtext && (
-                <p className="text-subtext text-sm md:text-base text-gray-300 italic opacity-0">
-                  {slide.subtext}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="slide-content absolute top-0 left-0 w-full h-full">
-        {slide.revealImage ? (
-          <ImageContainer 
-            baseImage={slide.src} 
-            revealImage={slide.revealImage} 
-          />
-        ) : (
-          <img
-            src={slide.src}
-            alt={`Slide ${slide.id}`}
-            className="absolute top-0 left-0 w-full h-full object-cover will-change-transform"
-            style={{ 
-              pointerEvents: 'none',
-              userSelect: 'none'
-            }}
-          />
-        )}
-      </div>
-    );
-  };
 
   return (
     <>

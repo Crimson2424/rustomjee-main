@@ -294,7 +294,7 @@ export const ImageContainer = ({ baseImage, revealImage }) => {
         aria-hidden="true"
       />
 
-      <style jsx>{`
+      <style>{`
         .ripple-effect {
           position: absolute;
           border-radius: 50%;
