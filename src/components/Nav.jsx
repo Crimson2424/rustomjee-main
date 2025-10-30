@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, useState } from 'react';
 import { IoHomeOutline } from "react-icons/io5";
 import { MdOutline360, MdOutlineInventory } from "react-icons/md";
 import { GrGallery } from "react-icons/gr";
@@ -26,65 +26,58 @@ const NavigationBar = forwardRef(({
   }
 }, ref) => {
   const navigate = useNavigate();
+  const [hoveredIcon, setHoveredIcon] = useState(null);
 
   const handleNavigation = (route) => {
     navigate(route);
   };
 
+  const iconConfig = [
+    { key: 'home', Icon: IoHomeOutline, label: 'Home', route: '/', show: showIcons.home },
+    { key: 'inventory', Icon: MdOutlineInventory, label: 'Features', route: '/features', show: showIcons.inventory },
+    { key: 'view360', Icon: MdOutline360, label: 'Drone Views', route: '/360-view', show: showIcons.view360 },
+    { key: 'gallery', Icon: GrGallery, label: 'Gallery', route: '/gallery', show: showIcons.gallery },
+    { key: 'floorPlan', Icon: FloorPlanIcon, label: 'Floor Plan', route: '/floorplan', show: showIcons.floorPlan, isCustom: true },
+    { key: 'location', Icon: LuMapPin, label: 'Map', route: '/location', show: showIcons.location }
+  ];
+
   return (
     <div
       ref={ref}
-      className={`${position} z-50 opacity-0  flex ${gap} xl:gap-15 xl:px-6 items-center ${padding} rounded-xs ${bgColor} ${textColor} ${className}`}
+      className={`${position} z-50 opacity-0 flex ${gap} xl:gap-15 xl:px-6 items-center ${padding} rounded-xs ${bgColor} ${textColor} ${className}`}
     >
-      {showIcons.home && (
-        <IoHomeOutline 
-        title="Home"
-          onClick={() => handleNavigation('/')}
-          className={`hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all  ${iconSize}`} 
-        />
-      )}
-      {showIcons.inventory && (
-        <MdOutlineInventory 
-        title="Features"
-          onClick={() => handleNavigation('/inventory')}
-          className={`hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl ${iconSize}`} 
-        />
-      )}
-      {showIcons.view360 && (
-        <MdOutline360
-        title="Drone views" 
-          onClick={() => handleNavigation('/360-view')}
-          className={`hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl ${iconSize}`} 
-        />
-      )}
-      {showIcons.gallery && (
-        <GrGallery 
-        title="Gallery"
-          onClick={() => handleNavigation('/gallery')}
-          className={`hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl ${iconSize}`} 
-        />
-      )}
-      {showIcons.floorPlan && (
-        <FloorPlanIcon 
-        title="Floor Plan"
-          onClick={() => handleNavigation('/floorplan')}
-          className="hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all h-5 xl:h-7" 
-        />
-      )}
-      {showIcons.amenities && (
-        <TbStack 
-        title='Amenities'
-          onClick={() => handleNavigation('/amenities')}
-          className={`hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl ${iconSize}`} 
-        />
-      )}
-      {showIcons.location && (
-        <LuMapPin 
-        title="Map"
-          onClick={() => handleNavigation('/location')}
-          className={`hover:scale-110 hover:-translate-y-2 hover:cursor-pointer transition-all text-xl xl:text-2xl ${iconSize}`} 
-        />
-      )}
+      {iconConfig.map(({ key, Icon, label, route, show, isCustom }) => (
+        show && (
+          <div
+            key={key}
+            className="relative flex flex-col items-center group"
+            onMouseEnter={() => setHoveredIcon(key)}
+            onMouseLeave={() => setHoveredIcon(null)}
+            onClick={() => handleNavigation(route)}
+          >
+            <Icon
+              title={label}
+              className={`${
+                isCustom 
+                  ? 'h-5 xl:h-7 hover:cursor-pointer' 
+                  : `text-xl xl:text-2xl ${iconSize}`
+              } hover:cursor-pointer transition-all duration-200 group-hover:scale-110 group-hover:-translate-y-2`}
+            />
+            
+            {/* Label appears below icon on hover */}
+            <span
+              className={`absolute -bottom-3 whitespace-nowrap text-xs font-medium transition-all duration-200 ${
+                hoveredIcon === key
+                  ? 'opacity-100 translate-y-0'
+                  : 'opacity-0 -translate-y-1 pointer-events-none'
+              }`}
+              style={{ color: '#3b4b9f' }}
+            >
+              {label}
+            </span>
+          </div>
+        )
+      ))}
     </div>
   );
 });
