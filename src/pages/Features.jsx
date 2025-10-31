@@ -4,6 +4,7 @@ import gsap from 'gsap';
 import { CustomEase } from 'gsap/CustomEase';
 import { useGSAP } from '@gsap/react';
 import { type1SlidesData } from '../constants/data';
+import Loader from '../components/Loader';
 
 // Register GSAP plugins
 gsap.registerPlugin(useGSAP, CustomEase);
@@ -289,6 +290,7 @@ const Broucher = () => {
   }, { scope: containerRef });
 
   return (
+    <Loader>
     <div ref={containerRef} className="h-screen overflow-hidden relative">
       <div className="relative w-full h-full">
         {type1SlidesData.map((slideData, index) => (
@@ -337,6 +339,7 @@ const Broucher = () => {
         </button>
       </div>
     </div>
+    </Loader>
   );
 };
 
