@@ -92,3 +92,129 @@ export const slidesData = [
   },
   
 ];
+export const type1SlidesData = [
+  {
+  
+  id: 1,
+  image: {
+    src: '/slides/1.jpg',
+    className: 'object-contain w-full h-full' // ✅ object-contain for image, removed bg color
+  },
+  title: {
+    text: '',
+    className: ''
+  },
+  showLineAfterTitle: false,
+  lineAfterTitleClassName: '',
+  
+  description: {
+    text: '',
+    className: ''
+  },
+  stats: [],
+  
+  contentClassName: 'w-0 overflow-hidden', // ✅ Hidden content section
+  statsContainerClassName: 'space-y-4',
+  
+  imageContainerClassName: 'w-full bg-white flex items-center justify-center' // ✅ Full width + background color + centering
+},
+{
+  id: 2,
+  image: {
+    src: '/slides/2.jpg',
+    className: 'object-contain w-full h-full' // ✅ object-contain for image, removed bg color
+  },
+  title: {
+    text: '',
+    className: ''
+  },
+  showLineAfterTitle: false,
+  lineAfterTitleClassName: '',
+  
+  description: {
+    text: '',
+    className: ''
+  },
+  stats: [],
+  
+  contentClassName: 'w-0 overflow-hidden', // ✅ Hidden content section
+  statsContainerClassName: 'space-y-4',
+  
+  imageContainerClassName: 'w-full bg-white flex items-center justify-center' 
+
+},
+{
+  id: 3,
+  image: {
+    src: '/slides/3.jpg',
+    className: 'object-contain w-full h-full' // ✅ object-contain for image, removed bg color
+  },
+  title: {
+    text: '',
+    className: ''
+  },
+  showLineAfterTitle: false,
+  lineAfterTitleClassName: '',
+  
+  description: {
+    text: '',
+    className: ''
+  },
+  stats: [],
+  
+  contentClassName: 'w-0 overflow-hidden', // ✅ Hidden content section
+  statsContainerClassName: 'space-y-4',
+  
+  imageContainerClassName: 'w-full bg-white flex items-center justify-center' 
+
+},
+{
+  id: 4,
+  image: {
+    src: '/slides/4.jpg',
+    className: 'object-contain w-full h-full' // ✅ object-contain for image, removed bg color
+  },
+  title: {
+    text: '',
+    className: ''
+  },
+  showLineAfterTitle: false,
+  lineAfterTitleClassName: '',
+  
+  description: {
+    text: '',
+    className: ''
+  },
+  stats: [],
+  
+  contentClassName: 'w-0 overflow-hidden', // ✅ Hidden content section
+  statsContainerClassName: 'space-y-4',
+  
+  imageContainerClassName: 'w-full bg-white flex items-center justify-center' 
+
+},
+{
+  id: 5,
+  image: {
+    src: '/slides/5.jpg',
+    className: 'object-contain w-full h-full' // ✅ object-contain for image, removed bg color
+  },
+  title: {
+    text: '',
+    className: ''
+  },
+  showLineAfterTitle: false,
+  lineAfterTitleClassName: '',
+  
+  description: {
+    text: '',
+    className: ''
+  },
+  stats: [],
+  
+  contentClassName: 'w-0 overflow-hidden', // ✅ Hidden content section
+  statsContainerClassName: 'space-y-4',
+  
+  imageContainerClassName: 'w-full bg-white flex items-center justify-center' 
+
+}]
