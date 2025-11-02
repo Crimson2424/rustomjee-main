@@ -94,127 +94,286 @@ export const slidesData = [
 ];
 export const type1SlidesData = [
   {
-  
-  id: 1,
-  image: {
-    src: '/slides/1.jpg',
-    className: 'object-contain w-full h-full' // ✅ object-contain for image, removed bg color
+    id: 1,
+    slideType: 'fullImage',
+    
+    // Background image (full screen)
+    image: {
+      src: '/slides/bg.jpg',
+      className: 'object-cover w-full h-full'
+    },
+    
+    // ✅ Top-left text
+    title: {
+      text: 'AN ADDRESS THE SKYLINE WILL REMEMBER.',
+      className: 'text-black text-4xl md:text-4xl font-light tracking-wide leading-tight'
+    },
+    
+    // ✅ Center image - full width, controlled height with cropping
+    centerImage: {
+      src: '/slides/1.1.jpg',
+      className: 'w-full h-full object-cover object-[center_30%]', // ✅ object-cover for cropping
+      containerClassName: 'w-full h-[60vh] mb-20' // ✅ Control height here (60% viewport height)
+    },
+    
+    // ✅ Big black line at bottom
+    bottomLine: {
+      show: true,
+      className: 'h-1 bg-black mx-20'
+    },
+    
+    // Layout configuration
+    imageContainerClassName: 'w-full h-full relative',
+    contentClassName: 'absolute top-12 left-12 z-20',
+    statsContainerClassName: '',
+    
+    description: { text: '', className: '' },
+    stats: []
   },
-  title: {
-    text: '',
-    className: ''
-  },
-  showLineAfterTitle: false,
-  lineAfterTitleClassName: '',
   
-  description: {
-    text: '',
-    className: ''
-  },
-  stats: [],
-  
-  contentClassName: 'w-0 overflow-hidden', // ✅ Hidden content section
-  statsContainerClassName: 'space-y-4',
-  
-  imageContainerClassName: 'w-full bg-white flex items-center justify-center' // ✅ Full width + background color + centering
-},
-{
+   {
   id: 2,
-  image: {
-    src: '/slides/2.jpg',
-    className: 'object-contain w-full h-full' // ✅ object-contain for image, removed bg color
-  },
-  title: {
-    text: '',
-    className: ''
-  },
-  showLineAfterTitle: false,
-  lineAfterTitleClassName: '',
-  
-  description: {
-    text: '',
-    className: ''
-  },
-  stats: [],
-  
-  contentClassName: 'w-0 overflow-hidden', // ✅ Hidden content section
-  statsContainerClassName: 'space-y-4',
-  
-  imageContainerClassName: 'w-full bg-white flex items-center justify-center' 
+  slideType: 'splitBackground',
 
+  leftSection: {
+    background: {
+      src: '/slides/2.2.jpg',
+      className: 'object-cover w-full h-full'
+    },
+    image: {
+      src: '/slides/2.1.jpg',
+      className: 'w-full max-w-6xl h-auto object-contain',
+      position: 'absolute left-8 top-1/2 -translate-y-1/2'
+    },
+    widthClassName: 'w-[60%]'
+  },
+
+  rightSection: {
+    background: {
+      src: '/slides/2.3.jpg',
+      className: 'object-cover w-full h-full'
+    },
+
+    // Title at top-right originally — switch to left if you want left alignment
+    topText: {
+      text: 'Boman R. Irani',
+      className: 'text-black text-4xl font-light uppercase text-right' // changed to left
+    },
+
+    // New: subtitle directly under title
+    topSubtext: {
+      text: 'Chairman & Managing Director,\nRustomjee Group',
+      className: 'text-black text-base font-light uppercase opacity-80 mt-2 text-right whitespace-pre-line'
+    },
+
+    // Mid paragraph with newline support and left align
+    midText: {
+      text: 'Our story in Bandra began with three marquee\naddresses in Pali Hill. Today, it rises to its\npinnacle at Mount Mary. Finding its rarest\nexpression yet. We are bringing to life a legacy\naddress - Cliff Tower. Close to the timeless chime\nof church bells and the whispers of sea breezes.\n\nJust thirty-seven residences, each one as rare as\nthe vantage it commands. An address poised\nbetween heritage and horizon.\n\nA life elevated, curated with restraint, crafted\nwith profound intent, and destined to be a part\nof Bandra\'s history.',
+      className: 'text-black uppercase text-right text-md font-light leading-relaxed whitespace-pre-line' // preserves \n
+    },bottomBoxes: [
+      { className: 'w-10 h-10 bg-black' },
+      { className: 'w-10 h-10 bg-black' },
+      { className: 'w-10 h-10 bg-[#C9B58E]' }
+    ],
+    bottomBoxesContainerClassName: 'flex gap-2 justify-end mt-2',
+
+    widthClassName: 'w-[40%]',
+    contentClassName: 'px-12 py-16'
+  }
 },
 {
   id: 3,
+  slideType: 'threeImages',
+  
+  // Background
   image: {
-    src: '/slides/3.jpg',
-    className: 'object-contain w-full h-full' // ✅ object-contain for image, removed bg color
+    src: '/slides/bg.jpg',
+    className: 'object-cover w-full h-full'
   },
+  
+  // Top text
   title: {
-    text: '',
-    className: ''
+    text: 'IMAGINE SPACES THAT ARE\nFELT, NOT JUST SEEN',
+    className: 'text-black text-left text-3xl font-thin uppercase tracking-wide whitespace-pre-line '
   },
-  showLineAfterTitle: false,
-  lineAfterTitleClassName: '',
   
-  description: {
-    text: '',
-    className: ''
+  // ✅ Three images - full width stretch with object-cover
+  middleImages: [
+    {
+      src: '/slides/3.1.jpg',
+      className: 'w-full h-full object-cover', // ✅ object-cover crops and fills
+      subtext: 'PATTY MAK',
+      subTextSecondLine: 'PRINCIPAL DESIGNER',
+      subtextClassName: 'text-black text-sm uppercase font-light tracking-wide',
+      subtextSecondLineClassName: 'text-black text-md uppercase font-thin opacity-70 mt-1'
+    },
+    {
+      src: '/slides/3.2.jpg',
+      className: 'w-full h-full object-cover',
+      subtext: 'SANJAY PURI',
+      subTextSecondLine: 'PRINCIPAL ARCHITECT',
+      subtextClassName: 'text-black text-sm uppercase font-light tracking-wide',
+      subtextSecondLineClassName: 'text-black text-md uppercase font-thin opacity-70 mt-1'
+    },
+    {
+      src: '/slides/3.3.jpg',
+      className: 'w-full h-full object-cover',
+      subtext: 'KUNAL MANIAR',
+      subTextSecondLine: 'LANDSCAPE DESIGN PARTNER',
+      subtextClassName: 'text-black text-sm uppercase font-light tracking-wide',
+      subtextSecondLineClassName: 'text-black text-md uppercase font-thin opacity-70 mt-1'
+    }
+  ],
+  middleImagesContainerClassName: 'flex gap-6 items-stretch w-full px-12', 
+  imageWrapperClassName: 'flex-1 h-80 overflow-hidden', 
+  // White line at bottom
+  bottomLine: {
+    show: true,
+    className: 'h-1 bg-white'
   },
-  stats: [],
   
-  contentClassName: 'w-0 overflow-hidden', // ✅ Hidden content section
-  statsContainerClassName: 'space-y-4',
-  
-  imageContainerClassName: 'w-full bg-white flex items-center justify-center' 
-
+  // Layout
+  imageContainerClassName: 'w-full h-full relative',
+  contentClassName: 'absolute top-12 left-12 z-20'
 },
+// data.js - Slide 4
+// data.js - Slide 4 with shared background
 {
   id: 4,
+  slideType: 'splitWithLists',
+  
+  // ✅ Shared background for entire slide
   image: {
-    src: '/slides/4.jpg',
-    className: 'object-contain w-full h-full' // ✅ object-contain for image, removed bg color
+    src: '/slides/bg.jpg',
+    className: 'object-cover w-full h-full'
   },
-  title: {
-    text: '',
-    className: ''
+  
+  // Left section - 40% with content
+  leftSection: {
+    title: {
+      text: 'SEAMLESSLY CONNECTED.\nSERENELY APART',
+      className: 'text-black text-3xl font-light uppercase tracking-wide whitespace-pre-line mb-12'
+    },
+    
+    lists: [
+      {
+        heading: 'SOUTH MUMBAI',
+        headingClassName: 'text-black text-lg font-semibold uppercase mb-4',
+        items: [
+          'WORLI: 15-25 MINUTES',
+          'MAHALAXMI/LOWER PAREL: 20-30 MINUTES',
+          'ALTAMOUNT ROAD/MALABAR HILL: 30-40 MINUTES',
+          'CUFFE PARADE/COLABA: 40-50 MINUTES'
+        ],
+        itemClassName: 'text-black text-sm font-light mb-2'
+      },
+      {
+        heading: 'WESTERN SUBURBS',
+        headingClassName: 'text-black text-lg font-semibold uppercase mb-4',
+        items: [
+          'JUHU: 10-15 MINUTES',
+          'VERSOVA: 15-20 MINUTES',
+          'ANDHERI WEST: 15-25 MINUTES',
+          'POWAI: 30-45 MINUTES'
+        ],
+        itemClassName: 'text-black text-sm font-light mb-2'
+      },
+      {
+        heading: 'COMMERCIAL HUBS',
+        headingClassName: 'text-black text-lg font-semibold uppercase mb-4',
+        items: [
+          'BANDRA-KURLA COMPLEX (BKC): 10-15 MINUTES',
+          'LOWER PAREL: 20-30 MINUTES'
+        ],
+        itemClassName: 'text-black text-sm font-light mb-2'
+      }
+    ],
+    listsContainerClassName: 'space-y-8',
+    
+    widthClassName: 'w-[40%]',
+    contentClassName: 'px-16 py-12 flex flex-col justify-center'
   },
-  showLineAfterTitle: false,
-  lineAfterTitleClassName: '',
   
-  description: {
-    text: '',
-    className: ''
+  // Right section - 60% with PNG overlay
+  rightSection: {
+    image: {
+      src: '/slides/4.2.png', // PNG with transparency
+      className: 'object-contain w-full h-full'
+    },
+    widthClassName: 'w-[60%]'
   },
-  stats: [],
   
-  contentClassName: 'w-0 overflow-hidden', // ✅ Hidden content section
-  statsContainerClassName: 'space-y-4',
-  
-  imageContainerClassName: 'w-full bg-white flex items-center justify-center' 
+  imageContainerClassName: 'w-full h-full relative'
+}
 
-},
-{
+,{
   id: 5,
+  slideType: 'threeImages',
+  
+  // Background
   image: {
-    src: '/slides/5.jpg',
-    className: 'object-contain w-full h-full' // ✅ object-contain for image, removed bg color
+    src: '/slides/bg.jpg',
+    className: 'object-cover w-full h-full'
   },
+  
+  // Top text
   title: {
-    text: '',
-    className: ''
+    text: 'DISCOVER OUR GATED COMMUNITIES THAT HAVE\nREDEFINED WHAT COMING HOME FEELS LIKE.',
+    className: 'text-black text-left text-3xl font-thin uppercase tracking-wide whitespace-pre-line'
   },
-  showLineAfterTitle: false,
-  lineAfterTitleClassName: '',
   
-  description: {
-    text: '',
-    className: ''
+  // Four images
+ middleImages: [
+  {
+    src: '/slides/5.1.jpg',
+    className: 'w-full h-full object-cover scale-100', // ✅ Added scale-150 to zoom 1.5x
+    subtext: 'Rustomjee Elements',
+    subTextSecondLine: 'Upper Juhu',
+    subtextClassName: 'text-black text-sm uppercase font-light tracking-wide',
+    subtextSecondLineClassName: 'text-black text-md font-thin opacity-70 mt-1'
   },
-  stats: [],
-  
-  contentClassName: 'w-0 overflow-hidden', // ✅ Hidden content section
-  statsContainerClassName: 'space-y-4',
-  
-  imageContainerClassName: 'w-full bg-white flex items-center justify-center' 
+  {
+    src: '/slides/5.2.jpg',
+    className: 'w-full h-full object-cover scale-100',
+    subtext: 'Rustomjee Seasons',
+    subTextSecondLine: 'BKC Annexe',
+    subtextClassName: 'text-black text-sm uppercase font-light tracking-wide',
+    subtextSecondLineClassName: 'text-black text-md uppercase font-thin opacity-70 mt-1'
+  },
+  {
+    src: '/slides/5.3.jpg',
+    className: 'w-full h-full object-cover scale-100',
+    subtext: 'Rustomjee urbania',
+    subTextSecondLine: 'Khar',
+    subtextClassName: 'text-black text-sm uppercase font-light tracking-wide',
+    subtextSecondLineClassName: 'text-black text-md uppercase font-thin opacity-70 mt-1'
+  },
+  {
+    src: '/slides/5.4.jpg',
+    className: 'w-full h-full object-cover scale-100',
+    subtext: 'Rustomjee Crown',
+    subTextSecondLine: 'Prabhadevi',
+    subtextClassName: 'text-black text-sm uppercase font-light tracking-wide',
+    subtextSecondLineClassName: 'text-black text-md uppercase font-thin opacity-70 mt-1'
+  }
+],
 
-}]
+  middleImagesContainerClassName: 'flex gap-6 items-stretch w-full px-12 h-[500px]',
+  imageWrapperClassName: 'flex-1  overflow-hidden', // ✅ Changed from h-90 to h-[500px]
+  
+  // White line at bottom
+  bottomLine: {
+    show: true,
+    className: 'h-1 bg-white'
+  },
+  
+  // Layout
+  imageContainerClassName: 'w-full h-full relative',
+  contentClassName: 'absolute top-12 left-12 z-20'
+}
+
+
+
+];
+
+
