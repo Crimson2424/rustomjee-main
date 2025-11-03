@@ -120,179 +120,189 @@ export default function StorySlider({
   };
 
   const { contextSafe } = useGSAP(
-    () => {
-      const slider = containerRef.current.querySelector('.slider');
-      let slideElements = slider.querySelectorAll('.slide');
+  () => {
+    const slider = containerRef.current.querySelector('.slider');
+    let slideElements = slider.querySelectorAll('.slide');
 
-      slideElements.forEach((slide, index) => {
-        if (index > 0) {
-          gsap.set(slide, {
-            clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)",
-          });
-        }
-      });
+    slideElements.forEach((slide, index) => {
+      if (index > 0) {
+        // ✅ Changed: Start from bottom instead of right
+        gsap.set(slide, {
+          clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
+        });
+      }
+    });
+
+    const firstSlide = slideElements[0];
+    if (firstSlide.querySelector('.text-heading')) {
+      animateTextElements(firstSlide);
+    }
+
+    const handleSliderNext = () => {
+      if (animatingRef.current) return;
+      animatingRef.current = true;
+
+      slideElements = slider.querySelectorAll('.slide');
 
       const firstSlide = slideElements[0];
-      if (firstSlide.querySelector('.text-heading')) {
-        animateTextElements(firstSlide);
+      const secondSlide = slideElements[1];
+
+      if (slideElements.length > 1) {
+        const nextCategory = secondSlide.getAttribute('data-category');
+        const nextSlideIndex = parseInt(secondSlide.getAttribute('data-slide-index'));
+        
+        setCurrentCategory(nextCategory);
+        setCurrentSlideIndex(nextSlideIndex);
+        
+        const firstAnimTarget = firstSlide.querySelector('.slide-content');
+        const secondAnimTarget = secondSlide.querySelector('.slide-content');
+        
+        // ✅ Changed: Animate from bottom (y: 500) instead of right (x: 250)
+        gsap.set(secondAnimTarget, { y: 500 });
+
+        gsap.to(secondAnimTarget, {
+          y: 0,
+          duration: duration,
+          ease: "hop",
+        });
+
+        // ✅ Changed: Exit to top (y: -500) instead of left (x: -500)
+        gsap.to(firstAnimTarget, {
+          y: -500,
+          duration: duration,
+          ease: "hop",
+        });
+
+        // ✅ Changed: Reveal from bottom
+        gsap.to(secondSlide, {
+          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+          duration: duration,
+          ease: "hop",
+          onUpdate: function() {
+            const progress = this.progress();
+            if (progress >= 0.33 && !secondSlide.dataset.textAnimated) {
+              secondSlide.dataset.textAnimated = 'true';
+              animateTextElements(secondSlide);
+            }
+          },
+          onComplete: function () {
+            firstSlide.remove();
+            slider.appendChild(firstSlide);
+
+            // ✅ Changed: Reset to bottom position
+            gsap.set(firstSlide, {
+              clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
+            });
+            
+            delete secondSlide.dataset.textAnimated;
+
+            animatingRef.current = false;
+          },
+        });
+      } else {
+        animatingRef.current = false;
+      }
+    };
+
+    const handleSliderPrev = () => {
+      if (animatingRef.current) return;
+      animatingRef.current = true;
+
+      slideElements = slider.querySelectorAll('.slide');
+
+      const lastSlide = slideElements[slideElements.length - 1];
+      const currentSlide = slideElements[0];
+
+      if (slideElements.length > 1) {
+        const prevCategory = lastSlide.getAttribute('data-category');
+        const prevSlideIndex = parseInt(lastSlide.getAttribute('data-slide-index'));
+        
+        setCurrentCategory(prevCategory);
+        setCurrentSlideIndex(prevSlideIndex);
+        
+        const currentAnimTarget = currentSlide.querySelector('.slide-content');
+        const lastAnimTarget = lastSlide.querySelector('.slide-content');
+        
+        slider.removeChild(lastSlide);
+        slider.insertBefore(lastSlide, currentSlide);
+
+        gsap.set(lastSlide, {
+          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+        });
+        // ✅ Changed: Start from top (y: -500) instead of left (x: -500)
+        gsap.set(lastAnimTarget, { y: -500 });
+        gsap.set(currentAnimTarget, { y: 0 });
+
+        gsap.to(lastAnimTarget, {
+          y: 0,
+          duration: duration,
+          ease: "hop",
+        });
+
+        // ✅ Changed: Exit to bottom (y: 500) instead of right (x: 250)
+        gsap.to(currentAnimTarget, {
+          y: 500,
+          duration: duration,
+          ease: "hop",
+        });
+
+        // ✅ Changed: Hide to bottom
+        gsap.to(currentSlide, {
+          clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
+          duration: duration,
+          ease: "hop",
+          onUpdate: function() {
+            const progress = this.progress();
+            if (progress >= 0.33 && !lastSlide.dataset.textAnimated) {
+              lastSlide.dataset.textAnimated = 'true';
+              animateTextElements(lastSlide);
+            }
+          },
+          onComplete: function () {
+            gsap.set(currentAnimTarget, { y: 0 });
+            delete lastSlide.dataset.textAnimated;
+            animatingRef.current = false;
+          },
+        });
+      } else {
+        animatingRef.current = false;
+      }
+    };
+
+    // ... rest of the code stays the same
+    const handleWheel = contextSafe((event) => {
+      if (animatingRef.current) {
+        accumulatedDelta.current = 0;
+        return;
       }
 
-      const handleSliderNext = () => {
-        if (animatingRef.current) return;
-        animatingRef.current = true;
+      const delta = event.deltaY;
+      accumulatedDelta.current += delta;
 
-        slideElements = slider.querySelectorAll('.slide');
-
-        const firstSlide = slideElements[0];
-        const secondSlide = slideElements[1];
-
-        if (slideElements.length > 1) {
-          const nextCategory = secondSlide.getAttribute('data-category');
-          const nextSlideIndex = parseInt(secondSlide.getAttribute('data-slide-index'));
-          
-          setCurrentCategory(nextCategory);
-          setCurrentSlideIndex(nextSlideIndex);
-          
-          const firstAnimTarget = firstSlide.querySelector('.slide-content');
-          const secondAnimTarget = secondSlide.querySelector('.slide-content');
-          
-          gsap.set(secondAnimTarget, { x: 250 });
-
-          gsap.to(secondAnimTarget, {
-            x: 0,
-            duration: duration,
-            ease: "hop",
-          });
-
-          gsap.to(firstAnimTarget, {
-            x: -500,
-            duration: duration,
-            ease: "hop",
-          });
-
-          gsap.to(secondSlide, {
-            clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-            duration: duration,
-            ease: "hop",
-            onUpdate: function() {
-              const progress = this.progress();
-              if (progress >= 0.33 && !secondSlide.dataset.textAnimated) {
-                secondSlide.dataset.textAnimated = 'true';
-                animateTextElements(secondSlide);
-              }
-            },
-            onComplete: function () {
-              firstSlide.remove();
-              slider.appendChild(firstSlide);
-
-              gsap.set(firstSlide, {
-                clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)",
-              });
-              
-              delete secondSlide.dataset.textAnimated;
-
-              animatingRef.current = false;
-            },
-          });
+      if (Math.abs(accumulatedDelta.current) >= SCROLL_THRESHOLD) {
+        if (accumulatedDelta.current > 0) {
+          handleSliderNext();
         } else {
-          animatingRef.current = false;
+          handleSliderPrev();
         }
-      };
+        
+        accumulatedDelta.current = 0;
+      }
+    });
 
-      const handleSliderPrev = () => {
-        if (animatingRef.current) return;
-        animatingRef.current = true;
+    window.addEventListener("wheel", handleWheel, { passive: true });
+    window.handleSliderNext = handleSliderNext;
+    window.handleSliderPrev = handleSliderPrev;
 
-        slideElements = slider.querySelectorAll('.slide');
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      delete window.handleSliderNext;
+      delete window.handleSliderPrev;
+    };
+  },
+  { scope: containerRef }
+);
 
-        const lastSlide = slideElements[slideElements.length - 1];
-        const currentSlide = slideElements[0];
-
-        if (slideElements.length > 1) {
-          const prevCategory = lastSlide.getAttribute('data-category');
-          const prevSlideIndex = parseInt(lastSlide.getAttribute('data-slide-index'));
-          
-          setCurrentCategory(prevCategory);
-          setCurrentSlideIndex(prevSlideIndex);
-          
-          const currentAnimTarget = currentSlide.querySelector('.slide-content');
-          const lastAnimTarget = lastSlide.querySelector('.slide-content');
-          
-          slider.removeChild(lastSlide);
-          slider.insertBefore(lastSlide, currentSlide);
-
-          gsap.set(lastSlide, {
-            clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-          });
-          gsap.set(lastAnimTarget, { x: -500 });
-          gsap.set(currentAnimTarget, { x: 0 });
-
-          gsap.to(lastAnimTarget, {
-            x: 0,
-            duration: duration,
-            ease: "hop",
-          });
-
-          gsap.to(currentAnimTarget, {
-            x: 250,
-            duration: duration,
-            ease: "hop",
-          });
-
-          gsap.to(currentSlide, {
-            clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)",
-            duration: duration,
-            ease: "hop",
-            onUpdate: function() {
-              const progress = this.progress();
-              if (progress >= 0.33 && !lastSlide.dataset.textAnimated) {
-                lastSlide.dataset.textAnimated = 'true';
-                animateTextElements(lastSlide);
-              }
-            },
-            onComplete: function () {
-              gsap.set(currentAnimTarget, { x: 0 });
-              delete lastSlide.dataset.textAnimated;
-              animatingRef.current = false;
-            },
-          });
-        } else {
-          animatingRef.current = false;
-        }
-      };
-
-      const handleWheel = contextSafe((event) => {
-        if (animatingRef.current) {
-          accumulatedDelta.current = 0;
-          return;
-        }
-
-        const delta = event.deltaY;
-        accumulatedDelta.current += delta;
-
-        if (Math.abs(accumulatedDelta.current) >= SCROLL_THRESHOLD) {
-          if (accumulatedDelta.current > 0) {
-            handleSliderNext();
-          } else {
-            handleSliderPrev();
-          }
-          
-          accumulatedDelta.current = 0;
-        }
-      });
-
-      window.addEventListener("wheel", handleWheel, { passive: true });
-      window.handleSliderNext = handleSliderNext;
-      window.handleSliderPrev = handleSliderPrev;
-
-      return () => {
-        window.removeEventListener("wheel", handleWheel);
-        delete window.handleSliderNext;
-        delete window.handleSliderPrev;
-      };
-    },
-    { scope: containerRef }
-  );
 
   const handleTouchStart = (e) => {
     touchStartY.current = e.touches[0].clientY;

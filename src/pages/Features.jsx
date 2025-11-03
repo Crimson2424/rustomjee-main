@@ -28,11 +28,11 @@ const GoldLine = ({ className = "" }) => {
 };
 
 const Type1Slide = ({ data }) => {
+  // ... (keep all your existing Type1Slide code exactly as is)
   // ✅ Handle split background type (Slide 2)
   if (data.slideType === 'splitBackground') {
     return (
       <div className="flex w-full h-full">
-        {/* Left section - 60% with background and image */}
         <div className={`${data.leftSection.widthClassName} relative h-full`}>
           <img 
             src={data.leftSection.background.src}
@@ -51,7 +51,6 @@ const Type1Slide = ({ data }) => {
           )}
         </div>
         
-        {/* Right section - 40% with background and text */}
         <div className={`${data.rightSection.widthClassName} relative h-full`}>
           <img 
             src={data.rightSection.background.src}
@@ -60,170 +59,150 @@ const Type1Slide = ({ data }) => {
           />
           
           <div className={`absolute inset-0 ${data.rightSection.contentClassName} flex flex-col`}>
-  {data.rightSection.topText && (
-    <div className={`${data.rightSection.topText.className} text-element mb-2`}>
-      {data.rightSection.topText.text}
-    </div>
-  )}
+            {data.rightSection.topText && (
+              <div className={`${data.rightSection.topText.className} text-element mb-2`}>
+                {data.rightSection.topText.text}
+              </div>
+            )}
 
-  {data.rightSection.topSubtext && (
-    <div className={`${data.rightSection.topSubtext.className} text-element mb-8`}>
-      {data.rightSection.topSubtext.text}
-    </div>
-  )}
+            {data.rightSection.topSubtext && (
+              <div className={`${data.rightSection.topSubtext.className} text-element mb-8`}>
+                {data.rightSection.topSubtext.text}
+              </div>
+            )}
 
-  {data.rightSection.midText && (
-    <div className={`${data.rightSection.midText.className} text-element mt-auto`}>
-      {data.rightSection.midText.text}
-    </div>
-  )}
-  {data.rightSection.bottomBoxes && (
-  <div className={`${data.rightSection.bottomBoxesContainerClassName} text-element`}>
-    {data.rightSection.bottomBoxes.map((box, index) => (
-      <div key={index} className={box.className} />
-    ))}
-  </div>
-)}
-</div>
+            {data.rightSection.midText && (
+              <div className={`${data.rightSection.midText.className} text-element mt-auto`}>
+                {data.rightSection.midText.text}
+              </div>
+            )}
+            
+            {data.rightSection.bottomBoxes && (
+              <div className={`${data.rightSection.bottomBoxesContainerClassName} text-element`}>
+                {data.rightSection.bottomBoxes.map((box, index) => (
+                  <div key={index} className={box.className} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
   }
 
-if (data.slideType === 'threeImages') {
-  return (
-    <div className="relative w-full h-full">
-      <div className={data.imageContainerClassName || 'w-full h-full relative'}>
-        {/* Background image */}
-        <img 
-          src={data.image.src} 
-          className={data.image.className}
-          alt=""
-        />
-        
-        {/* Top text */}
-        <div className={data.contentClassName}>
-          {data.title?.text && (
-            <h2 className={`${data.title.className} text-element`}>
-              {data.title.text}
-            </h2>
-          )}
-        </div>
-        
-        {/* ✅ Three images horizontally - stretch full width */}
-        {data.middleImages && (
-          <div className="absolute inset-0 flex items-center justify-center z-10 pt-10">
-            <div className={data.middleImagesContainerClassName}>
-              {data.middleImages.map((img, index) => (
-                <div key={index} className="flex flex-col items-center text-element flex-1">
-                  {/* ✅ Image wrapper - fixed size container */}
-                  <div className={data.imageWrapperClassName}>
-                    <img 
-                      src={img.src}
-                      className={img.className}
-                      alt=""
-                    />
-                  </div>
-                  
-                  {/* Subtext below image */}
-                  {img.subtext && (
-                    <div className="mt-4 text-center">
-                      <div className={img.subtextClassName}>
-                        {img.subtext}
-                      </div>
-                      {img.subTextSecondLine && (
-                        <div className={img.subtextSecondLineClassName}>
-                          {img.subTextSecondLine}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-        
-        {/* White line at bottom */}
-        {data.bottomLine?.show && (
-          <div className={`absolute bottom-10 left-20 right-20 w-auto ${data.bottomLine.className} z-20`} />
-        )}
-      </div>
-    </div>
-  );
-}
-// ✅ Handle split with lists type (Slide 4)
-// ✅ Handle split with lists type (Slide 4)
-if (data.slideType === 'splitWithLists') {
-  return (
-    <div className="relative w-full h-full">
-      {/* ✅ Shared background for entire slide */}
-      <div className={data.imageContainerClassName || 'w-full h-full relative'}>
-        <img 
-          src={data.image.src}
-          className={data.image.className}
-          alt=""
-        />
-        
-        {/* Content overlay - split sections */}
-        <div className="absolute inset-0 flex">
-          {/* Left section - Content with lists */}
-          <div className={`${data.leftSection.widthClassName} relative`}>
-            <div className={data.leftSection.contentClassName}>
-              {/* Title */}
-              {data.leftSection.title && (
-                <h2 className={`${data.leftSection.title.className} text-element`}>
-                  {data.leftSection.title.text}
-                </h2>
-              )}
-              
-              {/* Three lists */}
-              {data.leftSection.lists && (
-                <div className={data.leftSection.listsContainerClassName}>
-                  {data.leftSection.lists.map((list, listIndex) => (
-                    <div key={listIndex} className="text-element">
-                      <h3 className={list.headingClassName}>
-                        {list.heading}
-                      </h3>
-                      
-                      <ul className="list-none">
-                        {list.items.map((item, itemIndex) => (
-                          <li key={itemIndex} className={list.itemClassName}>
-                            • {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+  if (data.slideType === 'threeImages') {
+    return (
+      <div className="relative w-full h-full">
+        <div className={data.imageContainerClassName || 'w-full h-full relative'}>
+          <img 
+            src={data.image.src} 
+            className={data.image.className}
+            alt=""
+          />
+          
+          <div className={data.contentClassName}>
+            {data.title?.text && (
+              <h2 className={`${data.title.className} text-element`}>
+                {data.title.text}
+              </h2>
+            )}
           </div>
           
-          {/* ✅ Right section - PNG overlay only (no separate background) */}
-          <div className={`${data.rightSection.widthClassName} relative flex items-center justify-center`}>
-            <img 
-              src={data.rightSection.image.src}
-              className={data.rightSection.image.className}
-              alt=""
-            />
+          {data.middleImages && (
+            <div className="absolute inset-0 flex items-center justify-center z-10 pt-10">
+              <div className={data.middleImagesContainerClassName}>
+                {data.middleImages.map((img, index) => (
+                  <div key={index} className="flex flex-col items-center text-element flex-1">
+                    <div className={data.imageWrapperClassName}>
+                      <img 
+                        src={img.src}
+                        className={img.className}
+                        alt=""
+                      />
+                    </div>
+                    
+                    {img.subtext && (
+                      <div className="mt-4 text-center">
+                        <div className={img.subtextClassName}>
+                          {img.subtext}
+                        </div>
+                        {img.subTextSecondLine && (
+                          <div className={img.subtextSecondLineClassName}>
+                            {img.subTextSecondLine}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {data.bottomLine?.show && (
+            <div className={`absolute bottom-10 left-20 right-20 w-auto ${data.bottomLine.className} z-20`} />
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (data.slideType === 'splitWithLists') {
+    return (
+      <div className="relative w-full h-full">
+        <div className={data.imageContainerClassName || 'w-full h-full relative'}>
+          <img 
+            src={data.image.src}
+            className={data.image.className}
+            alt=""
+          />
+          
+          <div className="absolute inset-0 flex">
+            <div className={`${data.leftSection.widthClassName} relative`}>
+              <div className={data.leftSection.contentClassName}>
+                {data.leftSection.title && (
+                  <h2 className={`${data.leftSection.title.className} text-element`}>
+                    {data.leftSection.title.text}
+                  </h2>
+                )}
+                
+                {data.leftSection.lists && (
+                  <div className={data.leftSection.listsContainerClassName}>
+                    {data.leftSection.lists.map((list, listIndex) => (
+                      <div key={listIndex} className="text-element">
+                        <h3 className={list.headingClassName}>
+                          {list.heading}
+                        </h3>
+                        
+                        <ul className="list-none">
+                          {list.items.map((item, itemIndex) => (
+                            <li key={itemIndex} className={list.itemClassName}>
+                              • {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className={`${data.rightSection.widthClassName} relative flex items-center justify-center`}>
+              <img 
+                src={data.rightSection.image.src}
+                className={data.rightSection.image.className}
+                alt=""
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
-
-
-
-
-
-
-  // ✅ Original Type1Slide layout (Slide 1 and others)
   return (
     <div className="relative w-full h-full">
-      {/* Background image */}
       <div className={data.imageContainerClassName || 'w-full h-full relative'}>
         <img 
           src={data.image.src} 
@@ -231,7 +210,6 @@ if (data.slideType === 'splitWithLists') {
           alt={data.title?.text || ''}
         />
         
-        {/* ✅ Top-left text */}
         <div className={data.contentClassName}>
           {data.title?.text && (
             <h2 className={`${data.title.className} text-element`}>
@@ -240,7 +218,6 @@ if (data.slideType === 'splitWithLists') {
           )}
         </div>
         
-        {/* ✅ Center image - full width, controlled height */}
         {data.centerImage && (
           <div className="absolute inset-0 flex items-center justify-center z-10">
             <div className={data.centerImage.containerClassName}>
@@ -260,44 +237,21 @@ if (data.slideType === 'splitWithLists') {
   );
 };
 
-
-
-
-
-
-
-
 // Main Broucher Component
 const Broucher = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const containerRef = useRef(null);
 
-  // Random slide directions
+  // ✅ Updated: Bottom-to-top animation directions
   const getRandomDirection = () => {
     const directions = [
       { 
-        initial: { clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)", x: -500 },
-        final: { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", x: 0 }
-      },
-      { 
-        initial: { clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)", x: 500 },
-        final: { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", x: 0 }
-      },
-      { 
-        initial: { clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)", y: -300 },
+        initial: { clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)", y: 500 },
         final: { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", y: 0 }
       },
       { 
-        initial: { clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)", y: 300 },
+        initial: { clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)", y: -500 },
         final: { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", y: 0 }
-      },
-      { 
-        initial: { clipPath: "polygon(0% 0%, 0% 0%, 0% 0%, 0% 0%)", x: -300, y: -200 },
-        final: { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", x: 0, y: 0 }
-      },
-      { 
-        initial: { clipPath: "polygon(100% 100%, 100% 100%, 100% 100%, 100% 100%)", x: 300, y: 200 },
-        final: { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", x: 0, y: 0 }
       }
     ];
     return directions[Math.floor(Math.random() * directions.length)];
@@ -309,7 +263,7 @@ const Broucher = () => {
     slideDirections.current = type1SlidesData.map(() => getRandomDirection());
   }, []);
 
-  // ✅ Animate to target slide with TEXT ANIMATIONS
+  // ✅ Updated: Bottom-to-top slide animations
   const animateToSlide = (targetIndex) => {
     if (targetIndex === currentSlide) return;
     
@@ -330,10 +284,8 @@ const Broucher = () => {
     // Set initial state for target slide
     gsap.set(targetSlideEl, { clipPath: targetDirection.initial.clipPath, zIndex: 10 });
     gsap.set(targetContent, { 
-      x: targetDirection.initial.x || 0, 
       y: targetDirection.initial.y || 0 
     });
-    // ✅ Set text elements invisible
     gsap.set(targetTexts, { opacity: 0, y: 30 });
     gsap.set(currentSlideEl, { zIndex: 5 });
 
@@ -344,17 +296,15 @@ const Broucher = () => {
           zIndex: 1
         });
         gsap.set(currentContent, {
-          x: currentDirection.initial.x || 0,
           y: currentDirection.initial.y || 0
         });
         gsap.set(targetSlideEl, { zIndex: 1 });
       }
     });
 
-    // Slide animations
+    // ✅ Vertical slide animations
     tl.to(currentContent, {
-      x: currentDirection.initial.x || -500,
-      y: currentDirection.initial.y || 0,
+      y: currentDirection.initial.y || -500,
       duration: 2,
       ease: "hop"
     }, 0)
@@ -366,20 +316,18 @@ const Broucher = () => {
     }, 0)
     
     .to(targetContent, {
-      x: targetDirection.final.x || 0,
       y: targetDirection.final.y || 0,
       duration: 2,
       ease: "hop"
     }, 0)
     
-    // ✅ TEXT ANIMATIONS - Sequential with hop easing
     .to(targetTexts, {
       opacity: 1,
       y: 0,
       duration: 0.6,
-      stagger: 0.15, // Each element animates 0.15s after the previous
-      ease: "hop", // ✅ Using hop easing for text
-    }, 0.8); // Start text animations 0.8s after slide starts
+      stagger: 0.15,
+      ease: "hop",
+    }, 0.8);
     
     setCurrentSlide(targetIndex);
   };
@@ -396,7 +344,7 @@ const Broucher = () => {
     }
   };
 
-  // ✅ Initialize slides with first slide text animated
+  // ✅ Initialize slides
   useGSAP(() => {
     const slideElements = document.querySelectorAll('.slide');
     
@@ -407,9 +355,8 @@ const Broucher = () => {
         gsap.set(slide, {
           clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
         });
-        gsap.set(slide.querySelector('.slide-content'), { x: 0, y: 0 });
+        gsap.set(slide.querySelector('.slide-content'), { y: 0 });
         
-        // ✅ Animate first slide text on load
         const firstTexts = slide.querySelectorAll('.text-element');
         gsap.set(firstTexts, { opacity: 0, y: 30 });
         gsap.to(firstTexts, {
@@ -425,7 +372,6 @@ const Broucher = () => {
           clipPath: direction.initial.clipPath,
         });
         gsap.set(slide.querySelector('.slide-content'), { 
-          x: direction.initial.x || 0, 
           y: direction.initial.y || 0 
         });
       }
