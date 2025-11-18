@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import gsap from 'gsap';
 
-const CURSOR_SIZE = 80
+const CURSOR_SIZE = 80;
 const LERP_FACTOR = 0.1;
 
 export const ImageContainer = ({ baseImage, revealImage }) => {
@@ -14,6 +14,11 @@ export const ImageContainer = ({ baseImage, revealImage }) => {
   const topImageRef = useRef(null);
   const bottomImageRef = useRef(null);
   const cursorIndicatorRef = useRef(null);
+  
+  // ✅ New: SVG filter refs
+  const filterRef = useRef(null);
+  const turbulenceRef = useRef(null);
+  const displacementRef = useRef(null);
 
   const mousePos = useRef({ x: -CURSOR_SIZE, y: -CURSOR_SIZE });
   const animatedValues = useRef({
@@ -118,24 +123,20 @@ export const ImageContainer = ({ baseImage, revealImage }) => {
     const ripple = document.createElement('span');
     const rect = containerRef.current.getBoundingClientRect();
     
-    // Calculate maximum distance to cover entire container
     const maxDistance = Math.max(
       Math.sqrt(Math.pow(rect.width, 2) + Math.pow(rect.height, 2))
     );
     
-    // Ripple starts from cursor radius and expands outward
     const cursorRadius = currentCursorSize / 2;
     const finalSize = maxDistance * 2;
     
     const clickX = e.clientX - rect.left;
     const clickY = e.clientY - rect.top;
     
-    // Position the ripple centered on click point
     ripple.style.width = ripple.style.height = `${finalSize}px`;
     ripple.style.left = `${clickX - finalSize / 2}px`;
     ripple.style.top = `${clickY - finalSize / 2}px`;
     
-    // Set initial scale based on cursor size
     const initialScale = (cursorRadius * 2) / finalSize;
     ripple.style.setProperty('--initial-scale', initialScale);
     
@@ -153,11 +154,40 @@ export const ImageContainer = ({ baseImage, revealImage }) => {
     
     if (isAnimating || isMobileOrTablet) return;
 
-    // Get current cursor size to start ripple from its edge
     const currentCursorSize = animatedValues.current.size || CURSOR_SIZE;
     createRipple(e, currentCursorSize);
 
     setIsAnimating(true);
+
+    // ✅ New: Animate SVG filter to ripple entire image
+    if (turbulenceRef.current && displacementRef.current) {
+      turbulenceRef.current.setAttribute('baseFrequency', '0.001');
+      displacementRef.current.setAttribute('scale', '0');
+
+      const tlRipple = gsap.timeline();
+      tlRipple
+        .to({}, { duration: 0.02 })
+        .to(turbulenceRef.current, {
+          attr: { baseFrequency: 0.03 },
+          duration: 0.6,
+          ease: 'power2.out'
+        }, 0)
+        .to(displacementRef.current, {
+          attr: { scale: 45 },
+          duration: 0.6,
+          ease: 'power2.out'
+        }, 0)
+        .to(turbulenceRef.current, {
+          attr: { baseFrequency: 0.0005 },
+          duration: 1.2,
+          ease: 'power2.inOut'
+        })
+        .to(displacementRef.current, {
+          attr: { scale: 0 },
+          duration: 1.2,
+          ease: 'power2.inOut'
+        }, '<');
+    }
 
     const rect = containerRef.current.getBoundingClientRect();
     const maxRadius = Math.sqrt(Math.pow(rect.width, 2) + Math.pow(rect.height, 2));
@@ -270,29 +300,58 @@ export const ImageContainer = ({ baseImage, revealImage }) => {
       onMouseLeave={() => !isAnimating && setIsHovering(false)}
       onClick={handleClick}
     >
-      <img
-        ref={bottomImageRef}
-        src={baseImage}
-        alt="Base"
-        className="absolute top-0 left-0 w-full h-full object-cover select-none"
-        draggable="false"
-      />
+      {/* ✅ Filtered layer: apply filter to wrapper so both images get rippled */}
+      <div className="absolute top-0 left-0 w-full h-full ripple-target" style={{ filter: 'url(#imgRippleFilter)' }}>
+        <img
+          ref={bottomImageRef}
+          src={baseImage}
+          alt="Base"
+          className="absolute top-0 left-0 w-full h-full object-cover select-none"
+          draggable="false"
+        />
+        
+        <img
+          ref={topImageRef}
+          src={revealImage}
+          alt="Reveal"
+          className="absolute top-0 left-0 w-full h-full object-cover select-none"
+          style={{ willChange: 'clip-path, transform' }}
+          draggable="false"
+        />
+      </div>
       
-      <img
-        ref={topImageRef}
-        src={revealImage}
-        alt="Reveal"
-        className="absolute top-0 left-0 w-full h-full object-cover select-none"
-        style={{ willChange: 'clip-path, transform' }}
-        draggable="false"
-      />
-      
+      {/* Cursor indicator stays above */}
       <div
         ref={cursorIndicatorRef}
         className="absolute top-0 left-0 pointer-events-none rounded-full border-2 border-white/70 shadow-[0_0_15px_rgba(255,255,255,0.5)]"
         style={{ willChange: 'transform, opacity, width, height' }}
         aria-hidden="true"
       />
+
+      {/* ✅ Inline SVG filter (hidden) */}
+      <svg className="absolute w-0 h-0">
+        <filter id="imgRippleFilter" ref={filterRef} x="-20%" y="-20%" width="140%" height="140%">
+          {/* Base noise generator */}
+          <feTurbulence 
+            ref={turbulenceRef}
+            type="fractalNoise"
+            baseFrequency="0.0001"
+            numOctaves="1"
+            seed="2"
+            result="noise"
+          />
+          {/* Displace the image with the noise */}
+          <feDisplacementMap
+            ref={displacementRef}
+            in="SourceGraphic"
+            in2="noise"
+            scale="0"
+            xChannelSelector="R"
+            yChannelSelector="G"
+            result="rippled"
+          />
+        </filter>
+      </svg>
 
       <style>{`
         .ripple-effect {
