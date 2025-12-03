@@ -245,6 +245,8 @@ const Home = () => {
           start: "bottom bottom", 
           end: "bottom top",
           scrub: 2, 
+          invalidateOnRefresh: true,
+          onEnter: () => {}, // Ensures animation only plays on scroll
         },
       });
 
@@ -253,6 +255,7 @@ const Home = () => {
         scale: scaleValue, 
         ease: "power3.in",
         duration: 10,
+        immediateRender: false,
       });
 
       tlNav.to(navTarget, {
@@ -260,6 +263,7 @@ const Home = () => {
         yPercent: 0,
         ease: "power1.in",
         duration: 1,
+        immediateRender: false,
       }, "-=9");
 
       // --- STICKY RERA IMAGE ANIMATION ---
@@ -268,6 +272,7 @@ const Home = () => {
         opacity: 1,
         ease: "power2.out",
         duration: 2,
+        immediateRender: false,
       }, "-=2");
       
     }, container);
