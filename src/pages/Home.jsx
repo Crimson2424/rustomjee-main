@@ -241,7 +241,7 @@ const Home = () => {
       const tlNav = gsap.timeline({
         scrollTrigger: {
           trigger: skyImage.current,
-          markers: false,
+          // markers: true,
           start: "bottom bottom", 
           end: "bottom top",
           scrub: 2, 
