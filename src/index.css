@@ -1,16 +1,21 @@
 @font-face {
-  font-family: Futura;
-  src: url("/fonts/Futura\ Regular.ttf");
+  font-family: Futura-Medium;
+  src: url("/fonts/futura-medium.ttf");
 }
 
 @import "tailwindcss";
 /* index.css — brand scaffold */
+
+@theme{
+  --font-futura-medium: Futura-Medium, "sans-serif";
+}
 
 /* 1) Theme tokens */
 :root {
   --brand-deep-blue: #1d2938;            
   --brand-deep-blue-ink: #141c27;        
   --brand-deep-blue-tint: #314155;       
+  --font-sans: 'Balgin', 'Balgin Extra Light', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
   --font-sans: 'Balgin', 'Balgin Extra Light', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
 }
 
@@ -23,6 +28,7 @@
   font-style: normal;
   font-display: swap;
 }
+
 
 /* 3) Hide scrollbar globally */
 body::-webkit-scrollbar {

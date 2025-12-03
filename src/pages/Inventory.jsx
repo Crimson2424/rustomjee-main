@@ -4,6 +4,7 @@ import { data } from "../constants/data";
 import FloorComparisonPanel from "../components/FloorComparisonPanel";
 import NavigationBar from "../components/Nav";
 import Loader from "../components/Loader";
+import OrientationLock from "../components/OrientationLock";
 
 export default function Inventory() {
   const [layers] = useState(data);
@@ -19,7 +20,7 @@ export default function Inventory() {
     const centroids = {};
     
     layers.forEach(layer => {
-      if (layer.d && layer.floorNumber) {
+      if (layer.d && layer.floor_number) {
         // Parse the path data to get coordinates
         const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
         pathElement.setAttribute("d", layer.d);
@@ -29,7 +30,7 @@ export default function Inventory() {
           centroids[layer.path_id] = {
             x: bbox.x + bbox.width / 2,
             y: bbox.y + bbox.height / 2,
-            floorNumber: layer.floorNumber
+            floorNumber: layer.floor_number
           };
         } catch (e) {
           console.warn(`Could not calculate centroid for ${layer.path_id}`);
@@ -78,9 +79,10 @@ export default function Inventory() {
       const floor = {
         id: layer.path_id,
         d: layer.d,
+        floor_number: layer.floor_number,
         info: {
           bhk: layer.bhk || 'Duplex',
-          floorNumber: layer.floorNumber || 'XX',
+          floorNumber: layer.floor_number || 'XX',
           price: layer.price || 'XX Cr',
           area: layer.area || 'XXXX sq.ft',
           availability: layer.availability !== false
@@ -101,6 +103,7 @@ export default function Inventory() {
 
   return (
     <>
+    <OrientationLock />
     <Loader>
     <div className="fixed inset-0 w-full h-full overflow-hidden bg-[#dedbd4]">
       {/* Logo */}
