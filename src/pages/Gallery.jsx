@@ -465,7 +465,7 @@ export default function StorySlider({
         >
           {/* Close Button - Top Left */}
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/home")}
             className="fixed top-4 left-4 z-50 w-12 h-12 flex items-center justify-center bg-black/40 backdrop-blur-sm hover:bg-[#1d2938] rounded-full transition-all duration-300 cursor-pointer group"
           >
             <svg

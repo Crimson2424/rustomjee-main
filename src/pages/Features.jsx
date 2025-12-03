@@ -1,5 +1,6 @@
 // Broucher.jsx
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Add this import
 import gsap from 'gsap';
 import { CustomEase } from 'gsap/CustomEase';
 import { useGSAP } from '@gsap/react';
@@ -27,8 +28,41 @@ const GoldLine = ({ className = "" }) => {
   );
 };
 
+// Close Button Component
+const CloseButton = () => {
+  const navigate = useNavigate();
+
+  const handleClose = () => {
+    navigate("/home");
+  };
+
+  return (
+    <button
+      onClick={handleClose}
+      className="fixed top-4 right-4 z-50 p-2 bg-black/50 hover:bg-black/70 rounded-full transition-all duration-200 group"
+      aria-label="Close and return to home"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6 text-white group-hover:scale-110 transition-transform"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+    </button>
+  );
+};
+
 const Type1Slide = ({ data }) => {
-  // ... (keep all your existing Type1Slide code exactly as is)
+  // ... (keeping all slide type rendering logic unchanged)
+  
   // ✅ Handle split background type (Slide 2)
   if (data.slideType === 'splitBackground') {
     return (
@@ -241,8 +275,17 @@ const Type1Slide = ({ data }) => {
 const Broucher = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const containerRef = useRef(null);
+  const isAnimating = useRef(false);
+  const currentSlideRef = useRef(0);
+  
+  const totalSlides = type1SlidesData.length;
 
-  // ✅ Updated: Bottom-to-top animation directions
+  // ... (all your existing logic stays the same)
+
+  useEffect(() => {
+    currentSlideRef.current = currentSlide;
+  }, [currentSlide]);
+
   const getRandomDirection = () => {
     const directions = [
       { 
@@ -263,25 +306,31 @@ const Broucher = () => {
     slideDirections.current = type1SlidesData.map(() => getRandomDirection());
   }, []);
 
-  // ✅ Updated: Bottom-to-top slide animations
   const animateToSlide = (targetIndex) => {
-    if (targetIndex === currentSlide) return;
+    const current = currentSlideRef.current;
+    
+    if (targetIndex === current || isAnimating.current) return;
+    if (targetIndex < 0 || targetIndex >= totalSlides) return;
+    
+    isAnimating.current = true;
     
     gsap.killTweensOf(['.slide', '.slide-content', '.text-element']);
     
-    const currentSlideEl = document.querySelector(`[data-slide-index="${currentSlide}"]`);
+    const currentSlideEl = document.querySelector(`[data-slide-index="${current}"]`);
     const targetSlideEl = document.querySelector(`[data-slide-index="${targetIndex}"]`);
     
-    if (!currentSlideEl || !targetSlideEl) return;
+    if (!currentSlideEl || !targetSlideEl) {
+      isAnimating.current = false;
+      return;
+    }
 
     const currentContent = currentSlideEl.querySelector('.slide-content');
     const targetContent = targetSlideEl.querySelector('.slide-content');
     const targetTexts = targetSlideEl.querySelectorAll('.text-element');
 
     const targetDirection = slideDirections.current[targetIndex];
-    const currentDirection = slideDirections.current[currentSlide];
+    const currentDirection = slideDirections.current[current];
 
-    // Set initial state for target slide
     gsap.set(targetSlideEl, { clipPath: targetDirection.initial.clipPath, zIndex: 10 });
     gsap.set(targetContent, { 
       y: targetDirection.initial.y || 0 
@@ -299,10 +348,10 @@ const Broucher = () => {
           y: currentDirection.initial.y || 0
         });
         gsap.set(targetSlideEl, { zIndex: 1 });
+        isAnimating.current = false;
       }
     });
 
-    // ✅ Vertical slide animations
     tl.to(currentContent, {
       y: currentDirection.initial.y || -500,
       duration: 2,
@@ -333,18 +382,123 @@ const Broucher = () => {
   };
 
   const handlePrevSlide = () => {
-    if (currentSlide > 0) {
-      animateToSlide(currentSlide - 1);
+    const current = currentSlideRef.current;
+    if (current === 0) {
+      animateToSlide(totalSlides - 1);
+    } else {
+      animateToSlide(current - 1);
     }
   };
 
   const handleNextSlide = () => {
-    if (currentSlide < type1SlidesData.length - 1) {
-      animateToSlide(currentSlide + 1);
+    const current = currentSlideRef.current;
+    if (current === totalSlides - 1) {
+      animateToSlide(0);
+    } else {
+      animateToSlide(current + 1);
     }
   };
 
-  // ✅ Initialize slides
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let scrollTimeout = null;
+    let accumulatedDelta = 0;
+    const scrollThreshold = 50;
+
+    const handleWheel = (e) => {
+      e.preventDefault();
+      
+      if (isAnimating.current) return;
+
+      accumulatedDelta += e.deltaY;
+
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+
+      scrollTimeout = setTimeout(() => {
+        if (Math.abs(accumulatedDelta) >= scrollThreshold) {
+          if (accumulatedDelta > 0) {
+            handleNextSlide();
+          } else {
+            handlePrevSlide();
+          }
+        }
+        accumulatedDelta = 0;
+      }, 50);
+    };
+
+    container.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener('wheel', handleWheel);
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let touchStartY = 0;
+    let touchEndY = 0;
+    const swipeThreshold = 50;
+
+    const handleTouchStart = (e) => {
+      touchStartY = e.touches[0].clientY;
+    };
+
+    const handleTouchMove = (e) => {
+      e.preventDefault();
+    };
+
+    const handleTouchEnd = (e) => {
+      if (isAnimating.current) return;
+      
+      touchEndY = e.changedTouches[0].clientY;
+      const deltaY = touchStartY - touchEndY;
+
+      if (Math.abs(deltaY) >= swipeThreshold) {
+        if (deltaY > 0) {
+          handleNextSlide();
+        } else {
+          handlePrevSlide();
+        }
+      }
+    };
+
+    container.addEventListener('touchstart', handleTouchStart, { passive: true });
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    container.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+    return () => {
+      container.removeEventListener('touchstart', handleTouchStart);
+      container.removeEventListener('touchmove', handleTouchMove);
+      container.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (isAnimating.current) return;
+      
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+        e.preventDefault();
+        handleNextSlide();
+      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        handlePrevSlide();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   useGSAP(() => {
     const slideElements = document.querySelectorAll('.slide');
     
@@ -380,54 +534,40 @@ const Broucher = () => {
 
   return (
     <Loader>
-    <div ref={containerRef} className="h-screen overflow-hidden relative">
-      <div className="relative w-full h-full">
-        {type1SlidesData.map((slideData, index) => (
-          <div
-            key={slideData.id}
-            data-slide-index={index}
-            className="slide absolute inset-0 w-full h-full overflow-hidden"
-          >
-            <div className="slide-content absolute inset-0 w-full h-full">
-              <Type1Slide data={slideData} />
+      {/* ✅ Close Button Added Here */}
+      <CloseButton />
+      
+      <div ref={containerRef} className="h-screen overflow-hidden relative">
+        <div className="relative w-full h-full">
+          {type1SlidesData.map((slideData, index) => (
+            <div
+              key={slideData.id}
+              data-slide-index={index}
+              className="slide absolute inset-0 w-full h-full overflow-hidden"
+            >
+              <div className="slide-content absolute inset-0 w-full h-full">
+                <Type1Slide data={slideData} />
+              </div>
             </div>
+          ))}
+
+          {/* Slide Indicators */}
+          <div className="fixed right-6 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-2">
+            {type1SlidesData.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => animateToSlide(index)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  currentSlide === index 
+                    ? 'bg-[#C9A961] scale-125' 
+                    : 'bg-white/50 hover:bg-white/80'
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
           </div>
-        ))}
-
-        {/* Navigation Buttons */}
-        <button
-          onClick={handlePrevSlide}
-          disabled={currentSlide === 0}
-          className="fixed left-4 top-1/2 -translate-y-1/2 z-50 cursor-pointer transition-opacity duration-300 hover:opacity-80 disabled:opacity-30 disabled:cursor-not-allowed"
-          aria-label="Previous slide"
-        >
-          <img 
-            src="/left.png" 
-            alt="Previous" 
-            className="w-12 h-12 md:w-16 md:h-16"
-            style={{
-              filter: 'brightness(0) saturate(100%) invert(61%) sepia(85%) saturate(549%) hue-rotate(359deg) brightness(92%) contrast(87%)'
-            }}
-          />
-        </button>
-
-        <button
-          onClick={handleNextSlide}
-          disabled={currentSlide === type1SlidesData.length - 1}
-          className="fixed right-4 top-1/2 -translate-y-1/2 z-50 cursor-pointer transition-opacity duration-300 hover:opacity-80 disabled:opacity-30 disabled:cursor-not-allowed"
-          aria-label="Next slide"
-        >
-          <img 
-            src="/right.png" 
-            alt="Next" 
-            className="w-12 h-12 md:w-16 md:h-16"
-            style={{
-              filter: 'brightness(0) saturate(100%) invert(61%) sepia(85%) saturate(549%) hue-rotate(359deg) brightness(92%) contrast(87%)'
-            }}
-          />
-        </button>
+        </div>
       </div>
-    </div>
     </Loader>
   );
 };

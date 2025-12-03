@@ -158,22 +158,23 @@ export default function Inventory() {
             {hoveredLayer && floorCentroids[hoveredLayer] && (
               <g>
                 <text
-                  x={floorCentroids[hoveredLayer].x}
-                  y={floorCentroids[hoveredLayer].y}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  className="floor-number-glow"
-                  style={{
-                    fontSize: '120px',
-                    fontWeight: 'bold',
-                    fill: '#3b4b9f',
-                    filter: 'url(#blue-glow)',
-                    pointerEvents: 'none',
-                    fontFamily: 'Arial, sans-serif'
-                  }}
-                >
-                  {floorCentroids[hoveredLayer].floorNumber}
-                </text>
+                x={-100}
+                y={2500}
+                textAnchor="start"
+                dominantBaseline="middle"
+                className="floor-number-glow font-futura-medium "
+                style={{
+                  fontSize: '700px',
+                  fontWeight: 'bold',
+                  fill: 'rgba(0, 0, 20, 0.4)',
+                  filter: '',
+                  pointerEvents: 'none',
+                  // opacity:0.5,
+                  // fontFamily: 'Arial, sans-serif'
+                }}
+              >
+                {floorCentroids[hoveredLayer].floorNumber}
+              </text>
               </g>
             )}
           </g>

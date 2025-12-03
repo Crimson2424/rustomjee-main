@@ -89,7 +89,7 @@ const MusicController = ({ play }) => {
         <button
           onClick={toggleMute}
           className="
-            fixed top-6 right-6 z-[120]
+            fixed bottom-10 right-6 z-[120]
             flex items-center justify-center
           "
         >

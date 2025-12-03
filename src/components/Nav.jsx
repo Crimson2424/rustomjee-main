@@ -28,14 +28,25 @@ const NavigationBar = forwardRef(({
   const navigate = useNavigate();
   const [hoveredIcon, setHoveredIcon] = useState(null);
 
-  const handleNavigation = (route) => {
-    navigate(route);
+  const handleNavigation = (route, isExternal = false) => {
+    if (isExternal) {
+      window.open(route, '_blank');
+    } else {
+      navigate(route);
+    }
   };
 
   const iconConfig = [
-    { key: 'home', Icon: IoHomeOutline, label: 'Home', route: '/', show: showIcons.home },
+    { key: 'home', Icon: IoHomeOutline, label: 'Home', route: '/home', show: showIcons.home },
     { key: 'inventory', Icon: MdOutlineInventory, label: 'Features', route: '/features', show: showIcons.inventory },
-    { key: 'view360', Icon: MdOutline360, label: 'Drone Views', route: '/360-view', show: showIcons.view360 },
+    { 
+      key: 'view360', 
+      Icon: MdOutline360, 
+      label: 'Drone Views', 
+      route: 'https://view.pixeldo.com/RustomjeeCliffTower/', 
+      show: showIcons.view360,
+      isExternal: true 
+    },
     { key: 'gallery', Icon: GrGallery, label: 'Gallery', route: '/gallery', show: showIcons.gallery },
     { key: 'floorPlan', Icon: FloorPlanIcon, label: 'Floor Plan', route: '/floorplan', show: showIcons.floorPlan, isCustom: true },
     { key: 'map', Icon: LuMapPin, label: 'Map', route: '/map', show: showIcons.location }
@@ -46,14 +57,14 @@ const NavigationBar = forwardRef(({
       ref={ref}
       className={`${position} z-50 opacity-0 flex ${gap} xl:gap-15 xl:px-6 items-center ${padding} rounded-xs ${bgColor} ${textColor} ${className}`}
     >
-      {iconConfig.map(({ key, Icon, label, route, show, isCustom }) => (
+      {iconConfig.map(({ key, Icon, label, route, show, isCustom, isExternal }) => (
         show && (
           <div
             key={key}
             className="relative flex flex-col items-center group"
             onMouseEnter={() => setHoveredIcon(key)}
             onMouseLeave={() => setHoveredIcon(null)}
-            onClick={() => handleNavigation(route)}
+            onClick={() => handleNavigation(route, isExternal)}
           >
             <Icon
               title={label}
@@ -64,7 +75,6 @@ const NavigationBar = forwardRef(({
               } hover:cursor-pointer transition-all duration-200 group-hover:scale-110 group-hover:-translate-y-2`}
             />
             
-            {/* Label appears below icon on hover */}
             <span
               className={`absolute -bottom-3 whitespace-nowrap text-xs font-medium transition-all duration-200 ${
                 hoveredIcon === key
