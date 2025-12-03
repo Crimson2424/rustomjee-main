@@ -1,3 +1,4 @@
+//Loader for Map only
 import React, { useEffect, useRef, useState } from "react";
 import { useProgress } from "@react-three/drei";
 import gsap from "gsap";
