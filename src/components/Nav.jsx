@@ -38,7 +38,7 @@ const NavigationBar = forwardRef(({
     { key: 'view360', Icon: MdOutline360, label: 'Drone Views', route: '/360-view', show: showIcons.view360 },
     { key: 'gallery', Icon: GrGallery, label: 'Gallery', route: '/gallery', show: showIcons.gallery },
     { key: 'floorPlan', Icon: FloorPlanIcon, label: 'Floor Plan', route: '/floorplan', show: showIcons.floorPlan, isCustom: true },
-    { key: 'location', Icon: LuMapPin, label: 'Map', route: '/location', show: showIcons.location }
+    { key: 'map', Icon: LuMapPin, label: 'Map', route: '/map', show: showIcons.location }
   ];
 
   return (
