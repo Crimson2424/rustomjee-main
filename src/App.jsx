@@ -4,10 +4,13 @@ import Home from "./pages/Home"
 import Gallery from "./pages/Gallery"
 import Features from "./pages/Features"
 import Map from "./pages/Map"
+import ScrollToTop from "./components/ScrollToTop"
+
 
 const App =()=>{
     return (
       <BrowserRouter>
+      <ScrollToTop />
         <Routes>
       <Route path="/" element={<Home/>} />
       
