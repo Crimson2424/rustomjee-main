@@ -43,9 +43,8 @@ const NavigationBar = forwardRef(({
       key: 'view360', 
       Icon: MdOutline360, 
       label: 'Views', 
-      route: 'https://view.pixeldo.com/RustomjeeCliffTower/', 
+      route: '/views', 
       show: showIcons.view360,
-      isExternal: true 
     },
     { key: 'gallery', Icon: GrGallery, label: 'Gallery', route: '/gallery', show: showIcons.gallery },
     { key: 'floorPlan', Icon: FloorPlanIcon, label: 'Floor Plan', route: '/floorplan', show: showIcons.floorPlan, isCustom: true },

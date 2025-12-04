@@ -9,11 +9,22 @@ import OrientationLock from "./components/MobileOrientationAndFullscreen";
 import MusicController from "./components/MusicController";
 import HomeNav from "./pages/HomeNav";
 import BackButtonHandler from "./components/BackButtonHandler ";
+import Views from "./components/Views";
+
+// Global logo component
+const GlobalLogo = () => (
+  <img
+    src="/images/Brainwing-logo.webp"  // Update this path
+    alt="Logo"
+     className="fixed bottom-7 right-20 w-40 h-auto opacity-50 z-[9999] pointer-events-none"
+  />
+);
 
 const App = () => {
   return (
     <OrientationLock>
       <MusicController play={true}/>
+      <GlobalLogo />
       <BrowserRouter>
         <ScrollToTop />
         <BackButtonHandler />
@@ -27,6 +38,7 @@ const App = () => {
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/features" element={<Features />} />
           <Route path="/map" element={<Map />} />
+          <Route path="/views" element={<Views />} />
         </Routes>
       </BrowserRouter>
     </OrientationLock>

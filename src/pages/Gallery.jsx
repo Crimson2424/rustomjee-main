@@ -409,27 +409,50 @@ export default function StorySlider({
       <div className="slide-content absolute top-0 left-0 w-screen h-screen bg-black flex items-center justify-center">
         {/* Image Layer */}
         {slide.revealImage ? (
-          <ImageContainer
-            baseImage={slide.src}
-            revealImage={slide.revealImage}
-            duration={2.5}
-            numWaves={8}
-            amplitude={0.015}
-            enableTrail={false}
-            trailWaves={4}
-            trailAmplitude={0.008}
-            trailRadius={0.15}
-            trailDecay={1.0}
-            trailSpawnRate={0.03}
-            circleRadius={0.03}
-            glowIntensity={0.5}
-            glowSize={0.03}
-          />
+          <>
+            <ImageContainer
+              baseImage={slide.src}
+              revealImage={slide.revealImage}
+              duration={2.5}
+              numWaves={8}
+              amplitude={0.015}
+              enableTrail={false}
+              trailWaves={4}
+              trailAmplitude={0.008}
+              trailRadius={0.15}
+              trailDecay={1.0}
+              trailSpawnRate={0.03}
+              circleRadius={0.03}
+              glowIntensity={0.5}
+              glowSize={0.03}
+            />
+            {/* Click to Transition Indicator - Only for shader images */}
+            <div className="absolute bottom-24 sm:bottom-36 left-1/2 -translate-x-1/2 z-40 pointer-events-none">
+              <div className="flex flex-col items-center gap-4 animate-pulse  px-6 py-4 rounded-full">
+                <svg
+                  className="w-10 h-10 sm:w-12 sm:h-12 text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"
+                  />
+                </svg>
+                <span className="text-white text-base sm:text-lg lg:text-xl tracking-widest uppercase font-semibold font-futura-medium drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]">
+                  Click to reveal
+                </span>
+              </div>
+            </div>
+          </>
         ) : (
           <img
             src={slide.src}
             alt={`Slide ${slide.id}`}
-            className="w-full max-h-full object-cover" //max-w-full object-contain
+            className="w-full max-h-full object-cover"
             style={{
               pointerEvents: "none",
               userSelect: "none",
@@ -439,8 +462,8 @@ export default function StorySlider({
 
         {/* Title - Left Bottom */}
         {slide.title && (
-          <div className="absolute left-30 max-sm:left-10 max-sm:bottom-10 max-md:left-20 max-md:bottom-10  bottom-40  z-30">
-            <h2 className="slide-title text-white tracking-wide font-futura-medium  text-xl sm:text-2xl lg:text-4xl font-bold uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] opacity-0 ">
+          <div className="absolute left-30 max-sm:left-10 max-sm:bottom-10 max-md:left-20 max-md:bottom-10 bottom-40 z-30">
+            <h2 className="slide-title text-white tracking-wide font-futura-medium text-xl sm:text-2xl lg:text-4xl font-bold uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] opacity-0">
               {slide.title}
             </h2>
           </div>
