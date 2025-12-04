@@ -3,8 +3,6 @@ import OrientationLock from "../components/OrientationLock";
 import Loader from "../components/Loader";
 
 const HomeNav = () => {
-  
-
   return (
     <>
       {/* <OrientationLock /> */}
@@ -12,24 +10,28 @@ const HomeNav = () => {
 
       <div className="w-full h-screen overflow-hidden bg-[#7fa4c9] relative">
         
-        {/* Background Image - Width responsive only, anchored to bottom */}
-        <img
-          src="/images/SkyToBuilding1.2.png"
-          alt="Cliff Tower"
-          className="absolute bottom-0 left-0 w-full min-w-full h-auto pointer-events-none"
-          style={{ maxHeight: 'none' }}
+        {/* Background Image - Fixed size, anchored to bottom center */}
+        <div
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{
+            backgroundImage: 'url("/images/SkyToBuilding1.2.2.png")',
+            backgroundPosition: 'bottom center',
+            backgroundSize: 'cover',  // Keeps original image size
+            backgroundRepeat: 'no-repeat'
+            
+          }}
         />
 
         {/* Logo - Top Center */}
         <div
-          className="absolute top-6 left-1/2 -translate-x-1/2 z-40 cursor-pointer hover:scale-105 transition-transform duration-300"
-          
+          className="absolute top-3 left-1/2 -translate-x-1/2 z-40 cursor-pointer hover:scale-105 transition-transform duration-300 text-center font-balgin font-bold uppercase flex flex-col "
         >
           <img
-            src="/images/logo.svg"
+            src="/images/logo.png"
             alt="Rustomjee"
             className="h-12 xl:h-18 lg:h-16 w-auto 3xl:h-30 4xl:h-45"
           />
+          <p className="text-2xl ">Cliff Tower</p>
         </div>
 
         {/* RERA Image - Top Right */}
