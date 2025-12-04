@@ -82,14 +82,14 @@ export default function StorySlider({
   // Animate text elements when slide becomes active
   const animateTextElements = (slideElement) => {
     const title = slideElement.querySelector(".slide-title");
-  
+
     if (!title) return;
-  
+
     gsap.set(title, {
       opacity: 0,
       y: 30,
     });
-  
+
     gsap.to(title, {
       opacity: 1,
       y: 0,
@@ -103,7 +103,7 @@ export default function StorySlider({
     () => {
       const slider = containerRef.current.querySelector(".slider");
       let slideElements = slider.querySelectorAll(".slide");
-  
+
       slideElements.forEach((slide, index) => {
         if (index > 0) {
           gsap.set(slide, {
@@ -116,47 +116,47 @@ export default function StorySlider({
           }
         }
       });
-  
+
       const firstSlide = slideElements[0];
       if (firstSlide) {
         animateTextElements(firstSlide);
       }
-  
+
       const handleSliderNext = () => {
         if (animatingRef.current) return;
         animatingRef.current = true;
-  
+
         slideElements = slider.querySelectorAll(".slide");
-  
+
         const firstSlide = slideElements[0];
         const secondSlide = slideElements[1];
-  
+
         if (slideElements.length > 1) {
           const nextCategory = secondSlide.getAttribute("data-category");
           const nextSlideIndex = parseInt(
             secondSlide.getAttribute("data-slide-index")
           );
-  
+
           setCurrentCategory(nextCategory);
           setCurrentSlideIndex(nextSlideIndex);
-  
+
           const firstAnimTarget = firstSlide.querySelector(".slide-content");
           const secondAnimTarget = secondSlide.querySelector(".slide-content");
-  
+
           gsap.set(secondAnimTarget, { y: 500 });
-  
+
           gsap.to(secondAnimTarget, {
             y: 0,
             duration: duration,
             ease: "hop",
           });
-  
+
           gsap.to(firstAnimTarget, {
             y: -500,
             duration: duration,
             ease: "hop",
           });
-  
+
           gsap.to(secondSlide, {
             clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
             duration: duration,
@@ -174,16 +174,16 @@ export default function StorySlider({
               if (firstSlideTitle) {
                 gsap.set(firstSlideTitle, { opacity: 0, y: 30 });
               }
-  
+
               firstSlide.remove();
               slider.appendChild(firstSlide);
-  
+
               gsap.set(firstSlide, {
                 clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
               });
-  
+
               delete secondSlide.dataset.textAnimated;
-  
+
               animatingRef.current = false;
             },
           });
@@ -191,55 +191,56 @@ export default function StorySlider({
           animatingRef.current = false;
         }
       };
-  
+
       const handleSliderPrev = () => {
         if (animatingRef.current) return;
         animatingRef.current = true;
-  
+
         slideElements = slider.querySelectorAll(".slide");
-  
+
         const lastSlide = slideElements[slideElements.length - 1];
         const currentSlide = slideElements[0];
-  
+
         if (slideElements.length > 1) {
           const prevCategory = lastSlide.getAttribute("data-category");
           const prevSlideIndex = parseInt(
             lastSlide.getAttribute("data-slide-index")
           );
-  
+
           setCurrentCategory(prevCategory);
           setCurrentSlideIndex(prevSlideIndex);
-  
-          const currentAnimTarget = currentSlide.querySelector(".slide-content");
+
+          const currentAnimTarget =
+            currentSlide.querySelector(".slide-content");
           const lastAnimTarget = lastSlide.querySelector(".slide-content");
-  
+
           // Reset the title of the incoming slide before animating
           const lastSlideTitle = lastSlide.querySelector(".slide-title");
           if (lastSlideTitle) {
             gsap.set(lastSlideTitle, { opacity: 0, y: 30 });
           }
-  
+
           slider.removeChild(lastSlide);
           slider.insertBefore(lastSlide, currentSlide);
-  
+
           gsap.set(lastSlide, {
             clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
           });
           gsap.set(lastAnimTarget, { y: -500 });
           gsap.set(currentAnimTarget, { y: 0 });
-  
+
           gsap.to(lastAnimTarget, {
             y: 0,
             duration: duration,
             ease: "hop",
           });
-  
+
           gsap.to(currentAnimTarget, {
             y: 500,
             duration: duration,
             ease: "hop",
           });
-  
+
           gsap.to(currentSlide, {
             clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
             duration: duration,
@@ -253,11 +254,12 @@ export default function StorySlider({
             },
             onComplete: function () {
               // Reset the title of the slide that just left
-              const currentSlideTitle = currentSlide.querySelector(".slide-title");
+              const currentSlideTitle =
+                currentSlide.querySelector(".slide-title");
               if (currentSlideTitle) {
                 gsap.set(currentSlideTitle, { opacity: 0, y: 30 });
               }
-  
+
               gsap.set(currentAnimTarget, { y: 0 });
               delete lastSlide.dataset.textAnimated;
               animatingRef.current = false;
@@ -267,31 +269,31 @@ export default function StorySlider({
           animatingRef.current = false;
         }
       };
-  
+
       const handleWheel = contextSafe((event) => {
         if (animatingRef.current) {
           accumulatedDelta.current = 0;
           return;
         }
-  
+
         const delta = event.deltaY;
         accumulatedDelta.current += delta;
-  
+
         if (Math.abs(accumulatedDelta.current) >= SCROLL_THRESHOLD) {
           if (accumulatedDelta.current > 0) {
             handleSliderNext();
           } else {
             handleSliderPrev();
           }
-  
+
           accumulatedDelta.current = 0;
         }
       });
-  
+
       window.addEventListener("wheel", handleWheel, { passive: true });
       window.handleSliderNext = handleSliderNext;
       window.handleSliderPrev = handleSliderPrev;
-  
+
       return () => {
         window.removeEventListener("wheel", handleWheel);
         delete window.handleSliderNext;
@@ -427,14 +429,14 @@ export default function StorySlider({
           <img
             src={slide.src}
             alt={`Slide ${slide.id}`}
-            className="w-full max-h-full object-cover"   //max-w-full object-contain
+            className="w-full max-h-full object-cover" //max-w-full object-contain
             style={{
               pointerEvents: "none",
               userSelect: "none",
             }}
           />
         )}
-  
+
         {/* Title - Left Bottom */}
         {slide.title && (
           <div className="absolute left-30 max-sm:left-10 max-sm:bottom-10 max-md:left-20 max-md:bottom-10  bottom-40  z-30">
@@ -449,7 +451,7 @@ export default function StorySlider({
 
   return (
     <>
-    <OrientationLock />
+      <OrientationLock />
       <Loader>
         <div
           ref={containerRef}
@@ -463,10 +465,19 @@ export default function StorySlider({
             touchAction: "none",
           }}
         >
-          {/* Close Button - Top Left */}
+          {/* Logo - Top Left */}
+          <div className="fixed top-4 left-4 z-50 flex justify-start items-start">
+            <img
+              src="/images/logo.svg"
+              alt="Rustomjee"
+              className="h-12 w-auto"
+            />
+          </div>
+
+          {/* Close Button - Top Right */}
           <button
             onClick={() => navigate("/home")}
-            className="fixed top-4 left-4 z-50 w-12 h-12 flex items-center justify-center bg-black/40 backdrop-blur-sm hover:bg-[#1d2938] rounded-full transition-all duration-300 cursor-pointer group"
+            className="fixed top-4 right-4 z-50 w-12 h-12 flex items-center justify-center bg-black/40 backdrop-blur-sm hover:bg-[#1d2938] rounded-full transition-all duration-300 cursor-pointer group"
           >
             <svg
               className="w-6 h-6 text-white group-hover:scale-110 transition-transform"
@@ -482,15 +493,6 @@ export default function StorySlider({
               />
             </svg>
           </button>
-
-          {/* Logo - Top Right */}
-          <div className="fixed top-4 right-4 z-50 flex justify-end items-end">
-            <img
-              src="/images/logo.svg"
-              alt="Rustomjee"
-              className="h-12 w-auto"
-            />
-          </div>
 
           <div className="slider absolute top-0 left-0 w-full h-full overflow-hidden">
             {slides.map((slide, index) => (

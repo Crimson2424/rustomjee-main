@@ -1,14 +1,18 @@
-//Loader for Map only
 import React, { useEffect, useRef, useState } from "react";
 import { useProgress } from "@react-three/drei";
 import gsap from "gsap";
+import { useSceneReady } from "./SceneReadyContext";
 
 const Loader = () => {
   const { progress, active, loaded, total, item } = useProgress();
+  const { sceneReady } = useSceneReady();
   const [hidden, setHidden] = useState(false);
   const wrapRef = useRef(null);
   const barRef = useRef(null);
   const numRef = useRef(null);
+
+  // ✅ Combined ready state: assets loaded AND scene rendered
+  const isFullyReady = !active && progress === 100 && sceneReady;
 
   // animate bar + number as progress updates
   useEffect(() => {
@@ -26,17 +30,22 @@ const Loader = () => {
     });
   }, [progress]);
 
-  // fade out when loading done
+  // fade out when fully ready (both loaded AND rendered)
   useEffect(() => {
-    if (!active && wrapRef.current) {
-      gsap.to(wrapRef.current, {
-        autoAlpha: 0,
-        duration: 0.6,
-        ease: "power2.out",
-        onComplete: () => setHidden(true),
-      });
+    if (isFullyReady && wrapRef.current) {
+      // Small additional buffer for safety
+      const timer = setTimeout(() => {
+        gsap.to(wrapRef.current, {
+          autoAlpha: 0,
+          duration: 0.6,
+          ease: "power2.out",
+          onComplete: () => setHidden(true),
+        });
+      }, 200);
+      
+      return () => clearTimeout(timer);
     }
-  }, [active]);
+  }, [isFullyReady]);
 
   if (hidden) return null;
 
@@ -44,16 +53,16 @@ const Loader = () => {
     <div
       ref={wrapRef}
       className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#0b1220]/70 backdrop-blur-md"
-      style={{ pointerEvents: active ? "auto" : "none" }}
+      style={{ pointerEvents: isFullyReady ? "none" : "auto" }}
     >
       <div className="w-[min(380px,80vw)]">
-        {/* Tiny brand dot + title */}
         <div className="mb-4 flex items-center gap-2 text-white/90">
           <span className="inline-block h-2.5 w-2.5 rounded-full bg-white/90" />
-          <span className="text-sm tracking-widest uppercase">Loading</span>
+          <span className="text-sm tracking-widest uppercase">
+            {progress === 100 && !sceneReady ? "Preparing Scene…" : "Loading"}
+          </span>
         </div>
 
-        {/* Progress rail */}
         <div className="relative h-2 w-full overflow-hidden rounded-full bg-white/10">
           <div
             ref={barRef}
@@ -62,10 +71,13 @@ const Loader = () => {
           />
         </div>
 
-        {/* Meta row */}
         <div className="mt-3 flex items-center justify-between text-xs text-white/70">
           <div className="truncate max-w-[70%]">
-            {item ? item.split("/").pop() : "Preparing…"}
+            {progress === 100 && !sceneReady
+              ? "Initializing…"
+              : item
+              ? item.split("/").pop()
+              : "Preparing…"}
           </div>
           <div className="tabular-nums">
             <span ref={numRef}>0</span>% · {loaded}/{total}

@@ -159,7 +159,7 @@ export default function Inventory() {
               <g>
                 <text
                 x={-100}
-                y={2500}
+                y={1500}
                 textAnchor="start"
                 dominantBaseline="middle"
                 className="floor-number-glow font-futura-medium "

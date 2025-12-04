@@ -42,7 +42,7 @@ const NavigationBar = forwardRef(({
     { 
       key: 'view360', 
       Icon: MdOutline360, 
-      label: 'Drone Views', 
+      label: 'Views', 
       route: 'https://view.pixeldo.com/RustomjeeCliffTower/', 
       show: showIcons.view360,
       isExternal: true 
