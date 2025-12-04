@@ -17,7 +17,7 @@ const Experience = () => {
   const navigate = useNavigate(); // Add this hook
 
   const handleClose = () => {
-    navigate("/"); // Navigate to home page
+    navigate("/home"); // Navigate to home page
   };
 
   return (

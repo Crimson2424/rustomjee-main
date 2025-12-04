@@ -58,6 +58,13 @@ const Home = () => {
     midTextStart= "55% 40%";
     bandraStart = "10% top";
   }
+  else if(width>=2960){
+    scaleValue = 1.1;
+    yValue = -70;
+    startValue = "95% top";
+    midTextStart= "55% 40%";
+    bandraStart = "10% top";
+  }
   else if(width>=2560){
     scaleValue = 1.25;
     yValue = -340;
@@ -148,6 +155,10 @@ const Home = () => {
         onComplete: () => {
           document.body.style.overflow = "auto";
           setScrollEnabled(true);
+           // Refresh ScrollTrigger after intro completes
+          //  setTimeout(() => {
+          //   ScrollTrigger.refresh(true);
+          // }, 100);
         },
       });
 
@@ -177,6 +188,7 @@ const Home = () => {
   // 2. MID TEXT ANIMATION
   // ========================================================
   useEffect(() => {
+    
     if (!midText.current || !section1.current) return;
 
     const ctx = gsap.context(() => {
@@ -203,6 +215,7 @@ const Home = () => {
   // 3. BOTTOM ANIMATION (includes sticky RERA image)
   // ========================================================
   useEffect(() => {
+    if(!scrollEnabled) return;
     if (!section3.current || !bottomLogo.current || !skyImage.current) return;
 
     const ctx = gsap.context(() => {
@@ -217,8 +230,9 @@ const Home = () => {
       const tlLogo = gsap.timeline({
         scrollTrigger: {
           trigger: section3.current,
-          start: midTextStart,
-          end: "90% 65%",
+          // markers: true,
+          start: "top top",
+          end: "70% bottom",
           scrub: 2,
         },
       });
@@ -242,10 +256,11 @@ const Home = () => {
         scrollTrigger: {
           trigger: skyImage.current,
           // markers: true,
-          start: "bottom bottom", 
-          end: "bottom top",
+          start: "top top", 
+          end: "bottom bottom",
           scrub: 2, 
           invalidateOnRefresh: true,
+          immediateRender: false,
           onEnter: () => {}, // Ensures animation only plays on scroll
         },
       });
@@ -272,13 +287,13 @@ const Home = () => {
         opacity: 1,
         ease: "power2.out",
         duration: 2,
-        immediateRender: false,
+        // immediateRender: false,
       }, "-=2");
       
     }, container);
     
     return () => ctx.revert();
-  }, []);
+  }, [scrollEnabled]);
 
   return (
     <>
@@ -318,7 +333,7 @@ const Home = () => {
             </div>
 
             {/* OVERLAY CONTAINER: Covers entire Section 1 */}
-            <div className={`absolute top-0 left-0 w-full h-[200vh] lg:h-[] max-lg:h-[${bandraHeight}] max-md:h-[${bandraHeight}] max-xl:h-[100vh] max-2xl:h-[155vh] 3xl:h-[200vh] z-60 pointer-events-none flex flex-col`}>
+            <div className={`absolute top-0 left-0 w-full h-[200vh] lg:h-[] max-lg:h-[${bandraHeight}] max-md:h-[${bandraHeight}] max-xl:h-[200vh] max-2xl:h-[155vh] 3xl:h-[200vh] z-60 pointer-events-none flex flex-col`}>
             
               {/* --- TOP HALF: INTRO TEXT & SCROLL --- */}
               <div className="flex-1 relative w-full flex flex-col justify-end pb-10">
@@ -327,7 +342,7 @@ const Home = () => {
                   {/* Intro Text 1 */}
                   <h1 
                     ref={introText1} 
-                    className="absolute bottom-0 w-full text-center text-4xl max-md:text-2xl max-lg:text-2xl 3xl:text-6xl 4xl:text-8xl text-white opacity-0 uppercase font-bold" 
+                    className="absolute bottom-0 w-full text-center text-4xl max-md:text-2xl max-lg:text-2xl max-xl:text-3xl 3xl:text-4xl 4xl:text-6xl text-white opacity-0 uppercase font-bold" 
                     style={{ fontFamily: "Balgin, sans-serif" }}
                   >
                     A quiet statement perched above the tides of time.
@@ -336,7 +351,7 @@ const Home = () => {
                   {/* Intro Text 2 */}
                   <h1 
                     ref={introText2} 
-                    className="absolute bottom-0 w-full text-center text-4xl max-md:text-2xl max-lg:text-2xl 3xl:text-6xl 4xl:text-8xl text-white opacity-0 uppercase font-bold" 
+                    className="absolute bottom-0 w-full text-center text-4xl max-md:text-2xl max-lg:text-2xl 3xl:text-4xl 4xl:text-6xl text-white opacity-0 uppercase font-bold" 
                     style={{ fontFamily: "Balgin, sans-serif" }}
                   >
                     Where the sea tells its secrets
@@ -345,7 +360,7 @@ const Home = () => {
                   {/* Scroll Indicator */}
                   <div
                     ref={scrollIndicator}
-                    className="scroll-indicator absolute bottom-0 w-full flex flex-col items-center opacity-0 cursor-pointer pointer-events-auto"
+                    className={`scroll-indicator absolute bottom-0 w-full flex flex-col items-center opacity-0 cursor-pointer ${scrollEnabled? 'pointer-events-auto': 'pointer-events-none'}`}
                     onClick={() => gsap.to(window, { duration: 2, scrollTo: dreamInBandra.current, ease: "power3.inOut" })}
                   >
                     <p className="uppercase max-md:text-xl font-bold w-full text-center text-2xl 3xl:text-4xl 4xl:text-6xl text-white">Scroll</p>
@@ -385,7 +400,7 @@ const Home = () => {
           <section ref={section3} className="w-full h-auto relative overflow-hidden z-20">
             <div
               ref={bottomLogo}
-              className="absolute top-120 max-md:top-55 max-lg:top-100 3xl:top-230 4xl:top-380 3xl:text-7xl 4xl:text-9xl left-1/2 overflow-hidden -translate-x-1/2 text-5xl max-md:text-2xl max-lg:text-2xl text-black font-bold text-center z-30 opacity-0 mt-10"
+              className="absolute top-120 max-md:top-55 max-lg:top-100 3xl:top-210 4xl:top-380 3xl:text-7xl 4xl:text-9xl left-1/2 overflow-hidden -translate-x-1/2 text-5xl max-md:text-2xl max-lg:text-2xl text-black font-bold text-center z-30 opacity-0 mt-10"
             >
               <img src="/images/logo.png" alt="Logo" className="h-20 w-auto max-md:h-10 max-lg:h-10 3xl:h-30 4xl:h-60 mx-auto mb-4" />
               <p>CLIFF TOWER</p>
@@ -402,7 +417,7 @@ const Home = () => {
             
             {/* Navbar Wrapper */}
             <div className="absolute bottom-5 max-md:bottom-2 max-lg:bottom-2 left-0 w-full 4xl:bottom-20 px-10 z-50">
-              <NavigationBar className="bottom-nav opacity-0 3xl:scale-150 4xl:scale-250" />
+              <NavigationBar className="bottom-nav opacity-0 3xl:scale-150 4xl:scale-250 " />
             </div>
           </section>
 
