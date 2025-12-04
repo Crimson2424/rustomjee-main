@@ -18,13 +18,13 @@ const Disclaimer = ({ onStart }) => {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center text-white p-6"
+      className="absolute inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center text-white p-6 font-futura-medium"
     >
-      <h1 className="text-3xl font-semibold mb-4 text-center">
+      <h1 className="text-4xl font-semibold mb-4 text-center">
         Disclaimer
       </h1>
 
-      <p className="max-w-xl text-center text-lg mb-8 leading-relaxed">
+      <p className="max-w-xl text-center text-xl mb-8 leading-relaxed">
         This work is for <strong>presentation purposes only</strong> and does not
         represent the <strong>actual location</strong>. All models and visuals
         are conceptual and not exact representations of real-world locations.
