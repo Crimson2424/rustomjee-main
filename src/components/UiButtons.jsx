@@ -98,7 +98,10 @@ export default function UIButtons() {
       const isInsideContainer = containerRef.current && containerRef.current.contains(event.target);
       const isInsidePathCard = pathCardRef.current && pathCardRef.current.contains(event.target);
       
-      if (!isInsideContainer && !isInsidePathCard) {
+      // Check if click is on a portfolio card on the map
+      const isPortfolioCard = event.target.closest('[data-portfolio-card="true"]');
+
+      if (!isInsideContainer && !isInsidePathCard && !isPortfolioCard) {
         // Reset all button liquids
         Object.keys(liquidRefs.current).forEach((key) => {
           const liquid = liquidRefs.current[key];
