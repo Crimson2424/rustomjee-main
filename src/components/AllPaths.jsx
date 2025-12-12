@@ -86,10 +86,12 @@ function PathMarker({ position, duration, isActive }) {
 }
 
 // Simple Portfolio Location Card - Image + Name only
+import { RiPagesLine } from "react-icons/ri";
+
+// Portfolio Map Marker - Visible with name always shown
 function PortfolioLocationCard({ path, isSelected, onClick, index }) {
   const [isHovered, setIsHovered] = useState(false);
 
-  // Use the last point of the path as the card position
   const lastPoint = path.points[path.points.length - 1];
   const position = Array.isArray(lastPoint)
     ? [lastPoint[0], lastPoint[1] + 100, lastPoint[2]]
@@ -107,7 +109,6 @@ function PortfolioLocationCard({ path, isSelected, onClick, index }) {
       occlude={false}
       distanceFactor={2000}
     >
-      {/* Added data-portfolio-card attribute for click outside detection */}
       <div
         data-portfolio-card="true"
         onClick={(e) => {
@@ -116,142 +117,146 @@ function PortfolioLocationCard({ path, isSelected, onClick, index }) {
         }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        className="cursor-pointer flex flex-col items-center"
         style={{
-          cursor: 'pointer',
-          animation: `cardEntrance 0.6s ease-out forwards`,
-          animationDelay: `${index * 0.15}s`,
+          animation: `markerDrop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
+          animationDelay: `${index * 0.12}s`,
           opacity: 0,
         }}
       >
         <style>
           {`
-            @keyframes cardEntrance {
+            @keyframes markerDrop {
               0% {
                 opacity: 0;
-                transform: scale(0.5) translateY(20px);
+                transform: translateY(-50px) scale(0.5);
+              }
+              60% {
+                transform: translateY(8px) scale(1.05);
               }
               100% {
                 opacity: 1;
-                transform: scale(1) translateY(0);
+                transform: translateY(0) scale(1);
+              }
+            }
+            @keyframes float {
+              0%, 100% {
+                transform: translateY(0);
+              }
+              50% {
+                transform: translateY(-8px);
+              }
+            }
+            @keyframes shadowPulse {
+              0%, 100% {
+                transform: translateX(-50%) scale(1);
+                opacity: 0.3;
+              }
+              50% {
+                transform: translateX(-50%) scale(1.3);
+                opacity: 0.15;
               }
             }
           `}
         </style>
-        
-        {/* Card Container */}
+
+        {/* Main Marker Container */}
         <div
+          className="flex flex-col items-center transition-transform duration-300"
           style={{
-            width: '140px',
-            borderRadius: '12px',
-            overflow: 'hidden',
-            boxShadow: isSelected 
-              ? '0 8px 30px rgba(34, 121, 192, 0.4), 0 0 0 3px #2279C0'
-              : isHovered 
-                ? '0 12px 35px rgba(0, 0, 0, 0.3)'
-                : '0 8px 25px rgba(0, 0, 0, 0.2)',
-            transition: 'all 0.3s ease',
-            transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-            border: isSelected ? '3px solid #2279C0' : '3px solid white',
+            animation: isHovered ? 'float 2s ease-in-out infinite' : 'none',
+            transform: isSelected ? 'scale(1.1)' : 'scale(1)',
           }}
         >
-          {/* Image */}
+          {/* Card Body */}
           <div
-            style={{
-              width: '100%',
-              height: '90px',
-              position: 'relative',
-              overflow: 'hidden',
-            }}
+            className={`
+              bg-white rounded-lg p-2 px-3 flex items-center gap-2 transition-all duration-300
+              ${isSelected 
+                ? 'shadow-[0_8px_30px_rgba(34,121,192,0.4),0_0_0_2px_#2279C0]' 
+                : isHovered 
+                  ? 'shadow-[0_12px_35px_rgba(0,0,0,0.25)]'
+                  : 'shadow-[0_6px_20px_rgba(0,0,0,0.15)]'
+              }
+            `}
           >
-            {path.image ? (
-              <img
-                src={path.image}
-                alt={path.name}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  transition: 'transform 0.4s ease',
-                  transform: isHovered ? 'scale(1.1)' : 'scale(1)',
-                }}
-              />
-            ) : (
-              <div
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  background: 'linear-gradient(135deg, #2279C0 0%, #1a5a8a 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <span style={{ fontSize: '32px' }}>🏢</span>
-              </div>
-            )}
-            
-            {/* Gradient Overlay */}
+            {/* Icon Circle */}
             <div
-              style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: '50%',
-                background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
-              }}
-            />
-            
-            {/* Name on image */}
-            <div
-              style={{
-                position: 'absolute',
-                bottom: '10px',
-                left: '10px',
-                right: '10px',
-              }}
+              className={`
+                w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300
+                ${isSelected || isHovered
+                  ? 'bg-[#2279C0] shadow-[0_4px_12px_rgba(34,121,192,0.4)]'
+                  : 'bg-[#4A5568] shadow-[0_2px_8px_rgba(74,85,104,0.3)]'
+                }
+              `}
             >
-              <h3
-                style={{
-                  margin: 0,
-                  fontSize: '14px',
-                  fontWeight: '700',
-                  color: '#ffffff',
-                  textShadow: '0 2px 4px rgba(0,0,0,0.6)',
-                  textAlign: 'center',
-                }}
-              >
+              <RiPagesLine className="text-base text-white" />
+            </div>
+
+            {/* Text Content */}
+            <div className="flex flex-col">
+              <span className="font-futura-medium text-lg font-bold text-gray-900 whitespace-nowrap tracking-tight leading-tight">
                 {path.name}
-              </h3>
+              </span>
+              <span 
+                className={`
+                  font-futura-medium text-sm font-medium uppercase tracking-wide transition-colors duration-300 leading-tight
+                  ${isSelected ? 'text-[#2279C0]' : 'text-gray-500'}
+                `}
+              >
+                Portfolio
+              </span>
             </div>
           </div>
-        </div>
 
-        {/* Arrow pointing down */}
-        <div
-          style={{
-            width: 0,
-            height: 0,
-            borderLeft: '10px solid transparent',
-            borderRight: '10px solid transparent',
-            borderTop: isSelected ? '10px solid #2279C0' : '10px solid white',
-            margin: '0 auto',
-            filter: 'drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2))',
-            transition: 'border-color 0.3s ease',
-          }}
-        />
-        
-        {/* Connecting line */}
-        <div
-          style={{
-            width: '2px',
-            height: '25px',
-            background: isSelected 
-              ? 'linear-gradient(to bottom, #2279C0, transparent)'
-              : 'linear-gradient(to bottom, rgba(255,255,255,0.9), transparent)',
-            margin: '0 auto',
-          }}
-        />
+          {/* Pointer Triangle */}
+          <div
+            className="transition-all duration-300"
+            style={{
+              width: 0,
+              height: 0,
+              borderLeft: '10px solid transparent',
+              borderRight: '10px solid transparent',
+              borderTop: isSelected 
+                ? '10px solid #2279C0' 
+                : '10px solid #ffffff',
+              marginTop: '-1px',
+              filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15))',
+            }}
+          />
+
+          {/* Vertical Line */}
+          <div
+            className="w-[2px] h-6 rounded transition-all duration-300"
+            style={{
+              background: isSelected
+                ? 'linear-gradient(to bottom, #2279C0, rgba(34, 121, 192, 0.2))'
+                : 'linear-gradient(to bottom, #4A5568, rgba(74, 85, 104, 0.2))',
+            }}
+          />
+
+          {/* Pin Point */}
+          <div
+            className={`
+              w-3 h-3 rounded-full border-2 border-white transition-all duration-300
+              ${isSelected 
+                ? 'bg-[#2279C0] shadow-[0_0_0_2px_rgba(34,121,192,0.3),0_4px_10px_rgba(34,121,192,0.4)]'
+                : 'bg-[#4A5568] shadow-[0_0_0_2px_rgba(74,85,104,0.2),0_3px_8px_rgba(0,0,0,0.2)]'
+              }
+            `}
+          />
+
+          {/* Ground Shadow */}
+          <div
+            className="absolute left-1/2 w-10 h-2 rounded-full"
+            style={{
+              bottom: '-10px',
+              transform: 'translateX(-50%)',
+              background: 'radial-gradient(ellipse, rgba(0, 0, 0, 0.25) 0%, transparent 70%)',
+              animation: isSelected ? 'shadowPulse 2s ease-in-out infinite' : 'none',
+            }}
+          />
+        </div>
       </div>
     </Html>
   );
