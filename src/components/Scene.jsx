@@ -13,7 +13,7 @@ const Scene = () => {
   const disableAutoRotate = useRef(false);
   const targetMouse = useRef({ x: 0, y: 0 });
 
-  // //  if you want to log camera positions
+  //  if you want to log camera positions
   // useControls({
   //   "Log Camera Pos/Target": button(
   //     () => {

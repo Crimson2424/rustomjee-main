@@ -433,13 +433,13 @@ const Effects = () => {
           contrast={bcControls.contrast}
         />
       )} */}
-      <SelectiveBloom 
+      {/* <SelectiveBloom 
         selectionLayer={BLOOM_LAYER}
         intensity={1.0}
         luminanceThreshold={0.4}
         luminanceSmoothing={0.9}
         radius={0.8}
-      />
+      /> */}
 
       <BrightnessContrast
         brightness={0}
