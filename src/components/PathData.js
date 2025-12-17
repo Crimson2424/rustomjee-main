@@ -1,7 +1,7 @@
 export const pathData = {
   portfolio: [
     {
-      name: "Parishram",
+      name: "Rustomjee Parishram",
       description:
         "Rustomjee Parishram is a high-class residential project that answers all the needs of luxury living in Pali Hill. Designed by the acclaimed Rustomjee developers.",
       distance: 3.6,
@@ -165,7 +165,7 @@ export const pathData = {
       ],
     },
     {
-      name: "Panorama",
+      name: "Panorama By Rustomjee",
       description:
         "Situated in the reputed area of Pali Hill, Rustomjee Panorama stands strong as a testament to luxury living blended with a lucrative investment opportunity.",
       distance: 3.4,
@@ -327,7 +327,7 @@ export const pathData = {
       ],
     },
     {
-      name: "Crescent",
+      name: "Rustomjee Crescent",
       description:
         "Rustomjee Crescent is situated in the esteemed Pali Hill district of Mumbai and is a residential development that represents opulence and refinement.",
       distance: 3.4,
@@ -474,7 +474,7 @@ export const pathData = {
       ],
     },
     {
-      name: "La Fontaine ",
+      name: "Rustomjee La Fontaine ",
       description:
         "The Rustomjee La Fontaine located in Bandra, is a luxurious project that has a total super built up area of over 50,000 sq.ft.",
       distance: 2.0,
@@ -595,6 +595,36 @@ export const pathData = {
         [593.0953316900967, 0.4200000119208721, -1452.0642808042599],
         [588.9291922372738, 0.42000001192092895, -1515.1232557364567],
         [586.8117231159075, 0.42000001192092895, -1541.9567387082764],
+      ],
+    },
+    {
+      name: " La Solita",
+      description:
+        "Rustomjee La Solita is a value for money Project developed by one of the Mumbai well known Developers Rustomjee.",
+      distance: 2.0,
+      image: "/images/la fontaine.webp",
+      transport: {
+        car: 10, // time in minutes
+        walk: 27, // time in minutes
+        bike: 8, // time in minutes
+        transport: 24, // time in minutes (bus)
+      },
+      position: {
+        x: -157.95802245034508,
+        y: 1170.899118467383,
+        z: -2253.81561131582,
+      },
+      target: {
+        x: 370.57208629374134,
+        y: 27.179742770287422,
+        z: -1252.9359263496992,
+      },
+      points: [
+        [
+          904.8714519213399,
+          0.42000001192092895,
+          -1614.312500994838
+        ]
       ],
     },
   ],

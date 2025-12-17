@@ -181,7 +181,7 @@ function PortfolioLocationCard({ path, isSelected, onClick, index }) {
             `}
           >
             {/* Icon Circle */}
-            <div
+            {/* <div
               className={`
                 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300
                 ${isSelected || isHovered
@@ -191,21 +191,21 @@ function PortfolioLocationCard({ path, isSelected, onClick, index }) {
               `}
             >
               <RiPagesLine className="text-base text-white" />
-            </div>
+            </div> */}
 
             {/* Text Content */}
             <div className="flex flex-col">
               <span className="font-futura-medium text-lg font-bold text-gray-900 whitespace-nowrap tracking-tight leading-tight">
                 {path.name}
               </span>
-              <span 
+              {/* <span 
                 className={`
                   font-futura-medium text-sm font-medium uppercase tracking-wide transition-colors duration-300 leading-tight
                   ${isSelected ? 'text-[#2279C0]' : 'text-gray-500'}
                 `}
               >
                 Portfolio
-              </span>
+              </span> */}
             </div>
           </div>
 
