@@ -3,66 +3,148 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import gsap from "gsap";
 
-// SVG Path data for each floor type
-const BALCONY_SVG_CONFIG = {
-  // For 1st.png (floor 1) - balcony-svg-4.svg
+// Unit Plan SVG Configuration for each floor type
+// Each entry contains the SVG paths and their corresponding balcony view points
+const UNIT_PLAN_SVG_CONFIG = {
+  // For 1st floor - 4 SVG regions
   "1st": {
-    viewBox: "0 0 114.55609 49.218544",
-    transform: "translate(-125.05263, 3.7776315)",
-    path: "M 125.05263,45.331578 V 31.436841 l 0.17368,-3.299999 1.21579,-3.126316 1.56316,-3.126316 2.2579,-2.605263 2.95263,-2.257894 2.43158,-1.21579 2.43158,-0.868421 2.08421,-0.521053 h 1.0421 V -1.0421053 l 0.0868,-0.868421 0.30395,-0.5210526 0.17369,-0.3907894 0.73815,-0.5210527 0.43421,-0.3039473 0.47764,-0.1302633 81.94263,0.093233 h 0.42985 l 0.30703,0.061407 0.30703,0.1535168 0.46056,0.3223847 0.21492,0.1381649 0.18422,0.2456267 0.18422,0.2149232 0.19957,0.4298465 0.12281,0.3837915 0.0461,0.4144948 0.0614,0.1074616 V 15.35166 l 0.28673,0.06281 1.92391,0.919693 1.71939,1.043913 2.02642,1.535166 0.76746,0.799913 0.95526,1.085526 1.08553,1.389474 1.08552,1.867105 0.43421,0.998684 0.52105,1.519736 0.34737,1.21579 0.34737,1.389475 0.13026,1.432893 0.0434,2.214476 0.0548,12.614597 z"
+    totalPoints: 4,
+    regions: [
+      {
+        id: "1st_floor_1st",
+        point: 1,
+        viewBox: "0 0 55.473228 49.194225",
+        transform: "translate(-221.17132,-9.9018209)",
+        path: "m 276.60621,9.9171724 -37.04355,-0.015351 -0.69083,0.2763296 -0.55266,0.429847 -0.4759,0.506605 -0.16887,0.291681 -0.19957,0.521956 -0.0768,0.583364 0.0307,15.581933 -1.96502,0.245629 -1.10532,0.184219 -1.79614,0.598715 -1.70403,0.782934 -0.99786,0.521956 -0.76758,0.491255 -0.98251,0.660119 -0.79829,0.62942 -0.87504,0.813636 -0.56801,0.568013 -0.81364,0.936451 -0.56801,0.721529 -0.53731,0.875043 -0.59872,0.967155 -0.52195,1.089967 -0.49125,1.136023 -0.4145,1.013211 -0.32238,1.105318 -0.42985,1.949662 v 3.208496 l 7.66843,-0.01236 -0.0543,12.516117 46.40625,-0.03256 -0.0593,-26.019037 1.51215,-0.0077 V 9.9094998 Z",
+        // Position will be adjusted by user - these are initial estimates
+        position: { top: "8.0%", left: "77.6%", width: "13.28%" }
+      },
+      {
+        id: "1st_floor_2nd",
+        point: 2,
+        viewBox: "0 0 38.279106 48.732872",
+        transform: "translate(-182.65401,-54.316146)",
+        path: "m 220.88289,54.319736 h -17.78092 l -20.37116,34.812003 -0.0768,0.107461 0.23028,0.153517 0.0307,0.107463 -0.004,13.54883 38.01514,-0.0108 0.007,-48.72207 z",
+        position: { top: "20.3%", left: "68.5%", width: "9.2%" }
+      },
+      {
+        id: "1st_floor_3rd",
+        point: 3,
+        viewBox: "0 0 41.011173 34.27026",
+        transform: "translate(-150.30196,-147.40362)",
+        path: "m 191.3023,147.66414 -41.00033,-0.26052 0.0368,33.66921 0.22369,0.004 v -1.83454 h 9.44408 l 0.0326,2.33389 v 0.0543 l 31.27401,0.0434 z",
+        position: { top: "48.4%", left: "60.7%", width: "9.9%" }
+      },
+      {
+        id: "1st_floor_4th",
+        point: 4,
+        viewBox: "0 0 42.778641 34.053108",
+        transform: "translate(-117.95329,-205.57684)",
+        path: "m 125.18289,205.59868 h -7.2296 l 0.0109,34.03125 42.76774,-0.006 -0.009,-34.0471 z",
+        position: { top: "66%", left: "53%", width: "10.3%" }
+      }
+    ]
   },
-  // For multiple.png (floors 3-8, 10-15, 17) - balcony-svg-1_path2.svg
-  "multiple": {
-    viewBox: "0 0 115.07604 30.703321",
-    transform: "translate(-107.70725, 40.405571)",
-    path: "m 107.70725,-21.860764 0.24562,-3.315959 0.61407,-2.456265 1.35095,-3.193145 1.8422,-2.824707 2.33345,-2.456265 2.8247,-1.965013 3.43877,-1.473758 2.33346,-0.614066 1.59657,-0.122814 82.40771,-0.122815 1.96501,0.368441 2.33346,0.73688 1.96501,0.982506 2.08783,0.982507 1.96501,1.596572 0.9825,1.105318 0.98251,1.228135 1.10532,1.473759 0.73688,1.596572 0.85969,1.842199 0.61407,2.701893 0.36844,1.350946 v 5.526598 l 0.12281,9.2109957 -114.95323,-0.1228132 z"
-  },
-  // For 2ND-and-9TH.png (floors 2 and 9) - balcony-svg-2.svg
+  // For 2nd and 9th floors - 2 SVG regions
   "2nd-9th": {
-    viewBox: "0 0 114.95323 31.317392",
-    transform: "translate(48.265617, 76.267051)",
-    path: "m -48.142807,-57.845054 0.245628,-3.193148 0.614066,-2.701891 0.859692,-2.087827 1.350947,-2.456264 1.350947,-1.842199 1.842198,-1.842201 2.947519,-1.965013 2.456265,-1.105318 2.947519,-0.982506 1.228132,-0.245626 83.635847,0.122812 1.105318,0.122814 2.210638,0.614066 1.965013,0.73688 1.596573,0.859693 1.842201,1.350946 2.70189,2.824705 1.719387,2.333453 1.473758,3.438771 0.736881,3.561585 v 3.193145 12.035703 l -114.953231,0.122814 z"
+    totalPoints: 2,
+    regions: [
+      {
+        id: "2nd_9th_floor_1st",
+        point: 1,
+        viewBox: "0 0 110.47819 30.530424",
+        transform: "translate(-101.0753,-19.669739)",
+        path: "m 195.87237,19.669737 -79.07694,0.04179 -1.25884,0.153516 -2.17993,0.521957 -1.8729,0.644769 -1.10532,0.521957 -1.16673,0.675473 -0.64477,0.46055 -0.9518,0.675473 -0.76759,0.706176 -0.67547,0.64477 -1.01321,1.074616 -0.64477,0.798285 -0.79828,1.105321 -0.67548,1.19743 -0.52195,1.166725 -0.39915,0.997858 -0.41449,1.289539 -0.23027,0.951804 -0.12282,0.82899 -0.0921,0.491252 -0.10746,0.675473 -0.0768,2.425563 7.40131,-0.04041 -0.0597,12.521546 95.77056,-0.0163 V 37.66775 l 7.34303,0.01289 0.023,-2.325777 -0.18422,-1.281864 -0.22361,-1.23584 -0.52105,-1.628288 -0.83586,-2.073357 -0.53191,-0.922697 -0.74901,-1.161513 -1.09638,-1.378618 -1.28092,-1.346052 -1.2375,-1.096382 -1.5143,-1.031762 -2.25669,-1.212781 -2.71724,-0.890397 -1.71939,-0.322385 z",
+        position: { top: "13.76%", left: "49.2%", width: "23.8%" }
+      },
+      {
+        id: "2nd_9th_floor_2nd",
+        point: 2,
+        viewBox: "0 0 37.892307 48.012825",
+        transform: "translate(-63.202785,-40.04507)",
+        path: "M 100.97566,40.055921 H 83.194736 L 63.202785,74.179223 64.35,74.803618 v 13.254276 l 36.69079,-0.08684 0.0543,-47.925987 z",
+        position: { top: "20%", left: "41.32%", width: "7.9%" }
+      }
+    ]
   },
-  // For 16th.png (floor 16) - balcony-svg-3.svg
+  // For 16th floor - 2 SVG regions
   "16th": {
-    viewBox: "0 0 114.97894 31.697365",
-    transform: "translate(-126.00789, -14.155264)",
-    path: "m 126.09473,32.913158 0.17369,-1.997368 0.0868,-1.823686 0.43421,-1.736841 0.69474,-2.171053 1.38947,-2.518421 1.30263,-1.823684 1.99737,-2.257895 2.43158,-1.736842 2.2579,-1.215789 2.51842,-0.868421 3.12631,-0.521053 81.80526,-0.08684 0.95527,0.260526 1.47631,0.08684 2.17106,0.694737 2.43158,1.042105 1.73684,1.128948 1.56316,1.042105 1.21579,1.215789 1.30263,1.389474 1.30263,1.910526 0.86842,1.736843 0.69474,1.823684 0.52105,1.736841 0.34737,2.171055 -0.0868,1.823683 0.17368,13.547367 -114.97895,0.08684 z"
+    totalPoints: 2,
+    regions: [
+      {
+        id: "16th_floor_1st",
+        point: 1,
+        viewBox: "0 0 110.47819 30.530424",
+        transform: "translate(-101.0753,-19.669739)",
+        path: "m 195.87237,19.669737 -79.07694,0.04179 -1.25884,0.153516 -2.17993,0.521957 -1.8729,0.644769 -1.10532,0.521957 -1.16673,0.675473 -0.64477,0.46055 -0.9518,0.675473 -0.76759,0.706176 -0.67547,0.64477 -1.01321,1.074616 -0.64477,0.798285 -0.79828,1.105321 -0.67548,1.19743 -0.52195,1.166725 -0.39915,0.997858 -0.41449,1.289539 -0.23027,0.951804 -0.12282,0.82899 -0.0921,0.491252 -0.10746,0.675473 -0.0768,2.425563 7.40131,-0.04041 -0.0597,12.521546 95.77056,-0.0163 V 37.66775 l 7.34303,0.01289 0.023,-2.325777 -0.18422,-1.281864 -0.22361,-1.23584 -0.52105,-1.628288 -0.83586,-2.073357 -0.53191,-0.922697 -0.74901,-1.161513 -1.09638,-1.378618 -1.28092,-1.346052 -1.2375,-1.096382 -1.5143,-1.031762 -2.25669,-1.212781 -2.71724,-0.890397 -1.71939,-0.322385 z",
+        position: { top: "14%", left: "53.8%", width: "20.5%" }
+      },
+      {
+        id: "16th_floor_2nd",
+        point: 2,
+        viewBox: "0 0 37.892307 48.012825",
+        transform: "translate(-63.202785,-40.04507)",
+        path: "M 100.97566,40.055921 H 83.194736 L 63.202785,74.179223 64.35,74.803618 v 13.254276 l 36.69079,-0.08684 0.0543,-47.925987 z",
+        position: { top: "20%", left: "46.79%", width: "7%" }
+      }
+    ]
+  },
+  // For multiple floors (3-8, 10-15, 17) - 4 SVG regions
+  "multiple": {
+    totalPoints: 4,
+    regions: [
+      {
+        id: "multiple_floor_1st",
+        point: 1,
+        viewBox: "0 0 55.515442 31.198036",
+        transform: "translate(-221.03321,-32.04474)",
+        path: "m 276.33157,32.131579 -39.25262,-0.08684 -3.36527,0.715706 -3.74581,1.627275 -3.07033,2.241344 -1.8422,1.934308 -0.85969,1.136023 -1.04392,1.719386 -0.79828,1.688682 -0.58337,1.596573 -0.30703,1.228132 -0.18422,0.951804 -0.15352,1.19743 -0.0921,0.767583 v 1.750089 0.122814 h 7.69119 l -0.0366,12.499166 47.86086,0.02172 -0.0109,-31.105758 z",
+        position: { top: "13.7%", left: "77.62%", width: "13.27%" }
+      },
+      {
+        id: "multiple_floor_2nd",
+        point: 2,
+        viewBox: "0 0 38.279106 48.732872",
+        transform: "translate(-182.65401,-54.316146)",
+        path: "m 220.88289,54.319736 h -17.78092 l -20.37116,34.812003 -0.0768,0.107461 0.23028,0.153517 0.0307,0.107463 -0.004,13.54883 38.01514,-0.0108 0.007,-48.72207 z",
+        position: { top: "20.8%", left: "68.5%", width: "9.1%" }
+      },
+      {
+        id: "multiple_floor_3rd",
+        point: 3,
+        viewBox: "0 0 41.011173 34.27026",
+        transform: "translate(-150.30196,-147.40362)",
+        path: "m 191.3023,147.66414 -41.00033,-0.26052 0.0368,33.66921 0.22369,0.004 v -1.83454 h 9.44408 l 0.0326,2.33389 v 0.0543 l 31.27401,0.0434 z",
+        position: { top: "49.7%", left: "60.8%", width: "9.8%" }
+      },
+      {
+        id: "multiple_floor_4th",
+        point: 4,
+        viewBox: "0 0 42.778641 34.053108",
+        transform: "translate(-117.95329,-205.57684)",
+        path: "m 125.18289,205.59868 h -7.2296 l 0.0109,34.03125 42.76774,-0.006 -0.009,-34.0471 z",
+        position: { top: "67.72%", left: "53.02%", width: "10.3%" }
+      }
+    ]
   }
 };
-
-// Total number of viewpoints for balcony carousel
-const TOTAL_BALCONY_POINTS = 4;
-
-// Balcony Overlay Component
-function BalconyOverlay({ 
-  onBalconyClick, 
+// Single Unit Plan SVG Region Component
+function UnitPlanSvgRegion({ 
+  region, 
+  onRegionClick, 
   isSelected = false,
-  floorType = "multiple"
+  selectedPoint = null
 }) {
   const pathRef = useRef(null);
 
-  // Get SVG config based on floor type
-  const svgConfig = BALCONY_SVG_CONFIG[floorType] || BALCONY_SVG_CONFIG["multiple"];
-
-  // Correct positions for each floor plan image
-  const getPositionByFloorType = (type) => {
-    const positions = {
-      "1st": { top: "9.4%", left: "53.6%", width: "20.4%" },
-      "multiple": { top: "14.0%", left: "53.5%", width: "20.5%" },
-      "2nd-9th": { top: "13.7%", left: "55.7%", width: "20.5%" },
-      "16th": { top: "15.7%", left: "53.7%", width: "19.8%" },
-    };
-    return positions[type] || positions["multiple"];
-  };
-
-  const position = getPositionByFloorType(floorType);
+  const isThisRegionSelected = selectedPoint === region.point;
 
   const handleMouseEnter = () => {
-    if (pathRef.current && !isSelected) {
+    if (pathRef.current && !isThisRegionSelected) {
       gsap.to(pathRef.current, {
-        fill: "rgba(59, 130, 246, 0.5)",
-        stroke: "#3B82F6",
+        fill: "rgba(76, 175, 80, 0.6)",
+        stroke: "#4CAF50",
+        strokeWidth: 1,
         duration: 0.2,
         ease: "power2.out"
       });
@@ -70,10 +152,11 @@ function BalconyOverlay({
   };
 
   const handleMouseLeave = () => {
-    if (pathRef.current && !isSelected) {
+    if (pathRef.current && !isThisRegionSelected) {
       gsap.to(pathRef.current, {
-        fill: "rgba(59, 130, 246, 0.1)",
-        stroke: "rgba(59, 130, 246, 0.3)",
+        fill: "rgba(76, 175, 80, 0.3)",
+        stroke: "rgba(76, 175, 80, 0.5)",
+        strokeWidth: 0.5,
         duration: 0.2,
         ease: "power2.out"
       });
@@ -95,41 +178,42 @@ function BalconyOverlay({
       });
     }
     
-    onBalconyClick?.();
+    onRegionClick?.(region.point);
   };
 
-  // Update colors when isSelected changes
+  // Update colors when selection changes
   useEffect(() => {
     if (pathRef.current) {
       gsap.to(pathRef.current, {
-        fill: isSelected ? "rgba(76, 175, 80, 0.5)" : "rgba(59, 130, 246, 0.1)",
-        stroke: isSelected ? "#4CAF50" : "rgba(59, 130, 246, 0.3)",
+        fill: isThisRegionSelected ? "rgba(76, 175, 80, 0.7)" : "rgba(76, 175, 80, 0.3)",
+        stroke: isThisRegionSelected ? "#2E7D32" : "rgba(76, 175, 80, 0.5)",
+        strokeWidth: isThisRegionSelected ? 1.5 : 0.5,
         duration: 0.3,
         ease: "power2.out"
       });
     }
-  }, [isSelected]);
+  }, [isThisRegionSelected]);
 
   return (
     <svg
       className="absolute pointer-events-none"
       style={{
-        top: position.top,
-        left: position.left,
-        width: position.width,
+        top: region.position.top,
+        left: region.position.left,
+        width: region.position.width,
         height: 'auto',
         zIndex: 10,
       }}
-      viewBox={svgConfig.viewBox}
+      viewBox={region.viewBox}
       preserveAspectRatio="xMidYMid meet"
     >
-      <g transform={svgConfig.transform}>
+      <g transform={region.transform}>
         <path
           ref={pathRef}
-          d={svgConfig.path}
-          fill={isSelected ? "rgba(76, 175, 80, 0.5)" : "rgba(59, 130, 246, 0.1)"}
-          stroke={isSelected ? "#4CAF50" : "rgba(59, 130, 246, 0.3)"}
-          strokeWidth="0.5"
+          d={region.path}
+          fill={isThisRegionSelected ? "rgba(76, 175, 80, 0.7)" : "rgba(76, 175, 80, 0.3)"}
+          stroke={isThisRegionSelected ? "#2E7D32" : "rgba(76, 175, 80, 0.5)"}
+          strokeWidth={isThisRegionSelected ? 1.5 : 0.5}
           style={{
             cursor: 'pointer',
             pointerEvents: 'auto',
@@ -143,14 +227,40 @@ function BalconyOverlay({
   );
 }
 
+// Unit Plan Overlay Component - renders all SVG regions for a floor type
+function UnitPlanOverlay({ 
+  floorType = "multiple",
+  onRegionClick,
+  selectedPoint = null
+}) {
+  const config = UNIT_PLAN_SVG_CONFIG[floorType] || UNIT_PLAN_SVG_CONFIG["multiple"];
+
+  return (
+    <>
+      {config.regions.map((region) => (
+        <UnitPlanSvgRegion
+          key={region.id}
+          region={region}
+          onRegionClick={onRegionClick}
+          selectedPoint={selectedPoint}
+        />
+      ))}
+    </>
+  );
+}
+
+// Get the total number of balcony points for a floor type
+const getTotalBalconyPoints = (floorType) => {
+  const config = UNIT_PLAN_SVG_CONFIG[floorType] || UNIT_PLAN_SVG_CONFIG["multiple"];
+  return config.totalPoints;
+};
+
 // Balcony View Carousel Component
 function BalconyViewCarousel({ 
   floorNumber, 
   currentPoint, 
   onPointChange,
-  zoom,
-  pan,
-  isDragging 
+  totalPoints = 4 // Now dynamic based on floor type
 }) {
   const imageRef = useRef(null);
   const prevButtonRef = useRef(null);
@@ -186,7 +296,7 @@ function BalconyViewCarousel({
       });
     }
     
-    const newPoint = currentPoint === 1 ? TOTAL_BALCONY_POINTS : currentPoint - 1;
+    const newPoint = currentPoint === 1 ? totalPoints : currentPoint - 1;
     onPointChange(newPoint);
     if ('vibrate' in navigator) navigator.vibrate(20);
   };
@@ -205,7 +315,7 @@ function BalconyViewCarousel({
       });
     }
     
-    const newPoint = currentPoint === TOTAL_BALCONY_POINTS ? 1 : currentPoint + 1;
+    const newPoint = currentPoint === totalPoints ? 1 : currentPoint + 1;
     onPointChange(newPoint);
     if ('vibrate' in navigator) navigator.vibrate(20);
   };
@@ -244,14 +354,10 @@ function BalconyViewCarousel({
 
   return (
     <div className="relative w-full h-full">
-      {/* Balcony View Image */}
+      {/* Balcony View Image - No zoom */}
       <div
         ref={imageRef}
         className="relative inline-block w-full h-full"
-        style={{ 
-          transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
-          transformOrigin: 'center center',
-        }}
       >
         <img
           src={getBalconyViewImage(floorNumber, currentPoint)}
@@ -297,7 +403,7 @@ function BalconyViewCarousel({
 
       {/* Point Indicator - Minimal line style */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5">
-        {Array.from({ length: TOTAL_BALCONY_POINTS }, (_, i) => i + 1).map((point, index) => (
+        {Array.from({ length: totalPoints }, (_, i) => i + 1).map((point, index) => (
           <button
             key={point}
             ref={el => dotsRef.current[index] = el}
@@ -403,6 +509,63 @@ function Thumbnail({ imageSrc, onClick, borderColor = '#C19A40', label = 'Floor 
   );
 }
 
+// Plan Type Toggle Component
+function PlanTypeToggle({ isUnitPlan, onToggle, borderColor = '#C19A40' }) {
+  const toggleRef = useRef(null);
+  const sliderRef = useRef(null);
+
+  useEffect(() => {
+    if (sliderRef.current) {
+      gsap.to(sliderRef.current, {
+        left: isUnitPlan ? 'calc(100% - 22px)' : '2px',
+        duration: 0.3,
+        ease: "power2.out"
+      });
+    }
+  }, [isUnitPlan]);
+
+  const handleToggle = () => {
+    if (toggleRef.current) {
+      gsap.to(toggleRef.current, {
+        scale: 0.95,
+        duration: 0.1,
+        yoyo: true,
+        repeat: 1,
+        ease: "power2.inOut"
+      });
+    }
+    onToggle();
+    if ('vibrate' in navigator) navigator.vibrate(20);
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <span className={`text-xs font-medium transition-colors uppercase ${!isUnitPlan ? 'text-gray-800' : 'text-gray-400'}`}>
+        Floor Plan
+      </span>
+      <button
+        ref={toggleRef}
+        onClick={handleToggle}
+        className="relative w-14 h-7 rounded-full cursor-pointer transition-colors"
+        style={{ 
+          backgroundColor: isUnitPlan ? borderColor : '#E5E7EB',
+          border: `2px solid ${isUnitPlan ? borderColor : '#D1D5DB'}`
+        }}
+        title={isUnitPlan ? "Switch to Floor Plan" : "Switch to Unit Plan"}
+      >
+        <div
+          ref={sliderRef}
+          className="absolute top-1/2 -translate-y-1/2 w-5 h-5 bg-white rounded-full shadow-md"
+          style={{ left: isUnitPlan ? 'calc(100% - 22px)' : '2px' }}
+        />
+      </button>
+      <span className={`text-xs font-medium transition-colors uppercase ${isUnitPlan ? 'text-gray-800' : 'text-gray-400'}`}>
+        Unit Plan
+      </span>
+    </div>
+  );
+}
+
 export default function FloorComparisonPanel({ 
   show, 
   onClose, 
@@ -420,20 +583,24 @@ export default function FloorComparisonPanel({
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [activeDragFloor, setActiveDragFloor] = useState(null);
   
-  // Balcony selection state
-  const [firstFloorBalconySelected, setFirstFloorBalconySelected] = useState(false);
-  const [secondFloorBalconySelected, setSecondFloorBalconySelected] = useState(false);
+  // View mode state: 'floorplan', 'unitplan', or 'balcony'
+  const [firstFloorViewMode, setFirstFloorViewMode] = useState('unitplan');
+  const [secondFloorViewMode, setSecondFloorViewMode] = useState('unitplan');
   
-  // View mode state: 'floorplan' or 'balcony' - controls which image is in main view
-  const [firstFloorViewMode, setFirstFloorViewMode] = useState('floorplan');
-  const [secondFloorViewMode, setSecondFloorViewMode] = useState('floorplan');
-  
-  // Balcony carousel point state (1-4)
+  // Balcony carousel point state (1-4 depending on floor type)
   const [firstFloorBalconyPoint, setFirstFloorBalconyPoint] = useState(1);
   const [secondFloorBalconyPoint, setSecondFloorBalconyPoint] = useState(1);
   
+  // Selected region point for highlighting
+  const [firstFloorSelectedPoint, setFirstFloorSelectedPoint] = useState(null);
+  const [secondFloorSelectedPoint, setSecondFloorSelectedPoint] = useState(null);
+  
   // Right panel visibility state
   const [isRightPanelHidden, setIsRightPanelHidden] = useState(false);
+  
+  // Plan type toggle state: false = floor plan, true = unit plan (unit plan is default)
+  const [firstFloorIsUnitPlan, setFirstFloorIsUnitPlan] = useState(true);
+  const [secondFloorIsUnitPlan, setSecondFloorIsUnitPlan] = useState(true);
   
   const panelRef = useRef(null);
   const overlayRef = useRef(null);
@@ -448,7 +615,7 @@ export default function FloorComparisonPanel({
   const contentWrapperRef = useRef(null);
   const gridRef = useRef(null);
 
-  // Helper function to get floor type for balcony SVG selection
+  // Helper function to get floor type for SVG selection
   const getFloorType = (floorNumber) => {
     const floor = parseInt(floorNumber);
     if (floor === 1) return "1st";
@@ -462,62 +629,131 @@ export default function FloorComparisonPanel({
     return firstFloorViewMode === 'balcony' || secondFloorViewMode === 'balcony';
   }, [firstFloorViewMode, secondFloorViewMode]);
 
-  // Balcony click handlers - swap ALL floors to balcony view
-  const handleFirstFloorBalconyClick = () => {
-    setFirstFloorBalconySelected(true);
+  // Unit plan region click handlers - opens balcony view at specific point
+  const handleFirstFloorRegionClick = (point) => {
+    setFirstFloorSelectedPoint(point);
+    setFirstFloorBalconyPoint(point);
     setFirstFloorViewMode('balcony');
-    setFirstFloorBalconyPoint(1); // Reset to Point 1 when entering balcony view
+    // Reset zoom when switching to balcony view
+    setFirstFloorZoom(1);
+    setFirstFloorPan({ x: 0, y: 0 });
     
     // Also switch second floor to balcony view if it exists
     if (secondFloor) {
-      setSecondFloorBalconySelected(true);
+      const secondFloorType = getFloorType(secondFloor.info.floorNumber);
+      const secondFloorTotalPoints = getTotalBalconyPoints(secondFloorType);
+      // Use the same point if available, otherwise use point 1
+      const secondPoint = point <= secondFloorTotalPoints ? point : 1;
+      setSecondFloorSelectedPoint(secondPoint);
+      setSecondFloorBalconyPoint(secondPoint);
       setSecondFloorViewMode('balcony');
-      setSecondFloorBalconyPoint(1);
+      // Reset zoom for second floor too
+      setSecondFloorZoom(1);
+      setSecondFloorPan({ x: 0, y: 0 });
     }
     
-    console.log("Balcony clicked - switching all floors to balcony view");
+    console.log(`Region clicked - switching to balcony view at Point ${point}`);
     if ('vibrate' in navigator) navigator.vibrate(30);
   };
 
-  const handleSecondFloorBalconyClick = () => {
-    setSecondFloorBalconySelected(true);
+  const handleSecondFloorRegionClick = (point) => {
+    setSecondFloorSelectedPoint(point);
+    setSecondFloorBalconyPoint(point);
     setSecondFloorViewMode('balcony');
-    setSecondFloorBalconyPoint(1); // Reset to Point 1 when entering balcony view
+    // Reset zoom when switching to balcony view
+    setSecondFloorZoom(1);
+    setSecondFloorPan({ x: 0, y: 0 });
     
     // Also switch first floor to balcony view
-    setFirstFloorBalconySelected(true);
+    const firstFloorType = getFloorType(firstFloor.info.floorNumber);
+    const firstFloorTotalPoints = getTotalBalconyPoints(firstFloorType);
+    // Use the same point if available, otherwise use point 1
+    const firstPoint = point <= firstFloorTotalPoints ? point : 1;
+    setFirstFloorSelectedPoint(firstPoint);
+    setFirstFloorBalconyPoint(firstPoint);
     setFirstFloorViewMode('balcony');
-    setFirstFloorBalconyPoint(1);
+    // Reset zoom for first floor too
+    setFirstFloorZoom(1);
+    setFirstFloorPan({ x: 0, y: 0 });
     
-    console.log("Balcony clicked - switching all floors to balcony view");
+    console.log(`Region clicked - switching to balcony view at Point ${point}`);
     if ('vibrate' in navigator) navigator.vibrate(30);
   };
 
-  // Thumbnail click handlers - swap back to floor plan view for ALL floors
+  // Thumbnail click handlers - swap back to unit plan view for ALL floors
   const handleFirstFloorThumbnailClick = () => {
-    setFirstFloorBalconySelected(false);
-    setFirstFloorViewMode('floorplan');
+    setFirstFloorSelectedPoint(null);
+    setFirstFloorViewMode('unitplan');
+    setFirstFloorIsUnitPlan(true);
+    // Reset zoom when switching back to unit plan
+    setFirstFloorZoom(1);
+    setFirstFloorPan({ x: 0, y: 0 });
     
-    // Also switch second floor back to floor plan view if it exists
+    // Also switch second floor back to unit plan view if it exists
     if (secondFloor) {
-      setSecondFloorBalconySelected(false);
-      setSecondFloorViewMode('floorplan');
+      setSecondFloorSelectedPoint(null);
+      setSecondFloorViewMode('unitplan');
+      setSecondFloorIsUnitPlan(true);
+      // Reset zoom for second floor too
+      setSecondFloorZoom(1);
+      setSecondFloorPan({ x: 0, y: 0 });
     }
     
-    console.log("Thumbnail clicked - switching all floors back to floor plan");
+    console.log("Thumbnail clicked - switching all floors back to unit plan");
     if ('vibrate' in navigator) navigator.vibrate(30);
   };
 
   const handleSecondFloorThumbnailClick = () => {
-    setSecondFloorBalconySelected(false);
-    setSecondFloorViewMode('floorplan');
+    setSecondFloorSelectedPoint(null);
+    setSecondFloorViewMode('unitplan');
+    setSecondFloorIsUnitPlan(true);
+    // Reset zoom when switching back to unit plan
+    setSecondFloorZoom(1);
+    setSecondFloorPan({ x: 0, y: 0 });
     
-    // Also switch first floor back to floor plan view
-    setFirstFloorBalconySelected(false);
-    setFirstFloorViewMode('floorplan');
+    // Also switch first floor back to unit plan view
+    setFirstFloorSelectedPoint(null);
+    setFirstFloorViewMode('unitplan');
+    setFirstFloorIsUnitPlan(true);
+    // Reset zoom for first floor too
+    setFirstFloorZoom(1);
+    setFirstFloorPan({ x: 0, y: 0 });
     
-    console.log("Thumbnail clicked - switching all floors back to floor plan");
+    console.log("Thumbnail clicked - switching all floors back to unit plan");
     if ('vibrate' in navigator) navigator.vibrate(30);
+  };
+
+  // Plan type toggle handlers - sync both floors
+  const handleFirstFloorPlanToggle = () => {
+    const newValue = !firstFloorIsUnitPlan;
+    setFirstFloorIsUnitPlan(newValue);
+    setFirstFloorViewMode(newValue ? 'unitplan' : 'floorplan');
+    // Reset zoom when switching between floor/unit plan
+    setFirstFloorZoom(1);
+    setFirstFloorPan({ x: 0, y: 0 });
+    // Sync second floor if it exists
+    if (secondFloor) {
+      setSecondFloorIsUnitPlan(newValue);
+      setSecondFloorViewMode(newValue ? 'unitplan' : 'floorplan');
+      // Reset zoom for second floor too
+      setSecondFloorZoom(1);
+      setSecondFloorPan({ x: 0, y: 0 });
+    }
+  };
+
+  const handleSecondFloorPlanToggle = () => {
+    const newValue = !secondFloorIsUnitPlan;
+    setSecondFloorIsUnitPlan(newValue);
+    setSecondFloorViewMode(newValue ? 'unitplan' : 'floorplan');
+    // Reset zoom when switching between floor/unit plan
+    setSecondFloorZoom(1);
+    setSecondFloorPan({ x: 0, y: 0 });
+    // Sync first floor
+    setFirstFloorIsUnitPlan(newValue);
+    setFirstFloorViewMode(newValue ? 'unitplan' : 'floorplan');
+    // Reset zoom for first floor too
+    setFirstFloorZoom(1);
+    setFirstFloorPan({ x: 0, y: 0 });
   };
 
   // Calculate pan limits based on zoom level
@@ -562,11 +798,34 @@ export default function FloorComparisonPanel({
 
   // Drag/Pan handlers
   const handleMouseDown = (e, floorType) => {
-    if ((floorType === 'first' && firstFloorZoom > 1) || (floorType === 'second' && secondFloorZoom > 1)) {
-      setIsDragging(true);
-      setActiveDragFloor(floorType);
-      setDragStart({ x: e.clientX, y: e.clientY });
-      e.preventDefault();
+    if (floorType === 'first') {
+      if (firstFloorZoom > 1) {
+        // Enable dragging when zoomed in
+        setIsDragging(true);
+        setActiveDragFloor(floorType);
+        setDragStart({ x: e.clientX, y: e.clientY });
+        e.preventDefault();
+      }
+    } else if (floorType === 'second') {
+      if (secondFloorZoom > 1) {
+        // Enable dragging when zoomed in
+        setIsDragging(true);
+        setActiveDragFloor(floorType);
+        setDragStart({ x: e.clientX, y: e.clientY });
+        e.preventDefault();
+      }
+    }
+  };
+
+  // Click to zoom handler
+  const handleImageClick = (e, floorType) => {
+    // Only zoom in on click if not dragging and at base zoom or below
+    if (!isDragging) {
+      if (floorType === 'first' && firstFloorZoom <= 1) {
+        setFirstFloorZoom(prev => Math.min(prev + 0.3, 5));
+      } else if (floorType === 'second' && secondFloorZoom <= 1) {
+        setSecondFloorZoom(prev => Math.min(prev + 0.3, 5));
+      }
     }
   };
 
@@ -642,27 +901,28 @@ export default function FloorComparisonPanel({
            null;
   };
 
-  // Get floor plan image based on floor number
-  const getFloorPlanImage = useCallback((floorNumber) => {
+  // Get floor plan image based on floor number and plan type
+  const getFloorPlanImage = useCallback((floorNumber, isUnitPlan = false) => {
     const floor = parseInt(floorNumber);
+    const suffix = isUnitPlan ? '_unit' : '';
     
     if (floor === 1) {
-      return '/floors-images/1st.png';
+      return `/floors-images/1st${suffix}.png`;
     }
 
     if (floor === 2 || floor === 9) {
-      return '/floors-images/2ND-and-9TH.png';
+      return `/floors-images/2ND-and-9TH${suffix}.png`;
     }
     
     if (floor === 16) {
-      return '/floors-images/16th.png';
+      return `/floors-images/16th${suffix}.png`;
     }
     
     if ((floor >= 3 && floor <= 8) || (floor >= 10 && floor <= 15) || floor === 17) {
-      return '/floors-images/multiple.png';
+      return `/floors-images/multiple${suffix}.png`;
     }
     
-    return '/floors-images/multiple.png';
+    return `/floors-images/multiple${suffix}.png`;
   }, []);
 
   // Helper to check if two floors have different images (can be compared)
@@ -701,13 +961,16 @@ export default function FloorComparisonPanel({
       setSecondFloorZoom(1);
       setFirstFloorPan({ x: 0, y: 0 });
       setSecondFloorPan({ x: 0, y: 0 });
-      // Reset balcony selections and view modes
-      setFirstFloorBalconySelected(false);
-      setSecondFloorBalconySelected(false);
-      setFirstFloorViewMode('floorplan');
-      setSecondFloorViewMode('floorplan');
+      // Reset view modes to unit plan (default)
+      setFirstFloorViewMode('unitplan');
+      setSecondFloorViewMode('unitplan');
       setFirstFloorBalconyPoint(1);
       setSecondFloorBalconyPoint(1);
+      setFirstFloorSelectedPoint(null);
+      setSecondFloorSelectedPoint(null);
+      // Reset plan type toggles to default (unit plan)
+      setFirstFloorIsUnitPlan(true);
+      setSecondFloorIsUnitPlan(true);
     } else if (show && !lockedFloor) {
       setFirstFloor(null);
       setSecondFloor(null);
@@ -715,12 +978,14 @@ export default function FloorComparisonPanel({
       setSecondFloorZoom(1);
       setFirstFloorPan({ x: 0, y: 0 });
       setSecondFloorPan({ x: 0, y: 0 });
-      setFirstFloorBalconySelected(false);
-      setSecondFloorBalconySelected(false);
-      setFirstFloorViewMode('floorplan');
-      setSecondFloorViewMode('floorplan');
+      setFirstFloorViewMode('unitplan');
+      setSecondFloorViewMode('unitplan');
       setFirstFloorBalconyPoint(1);
       setSecondFloorBalconyPoint(1);
+      setFirstFloorSelectedPoint(null);
+      setSecondFloorSelectedPoint(null);
+      setFirstFloorIsUnitPlan(true);
+      setSecondFloorIsUnitPlan(true);
     }
   }, [show, lockedFloor]);
 
@@ -867,29 +1132,39 @@ export default function FloorComparisonPanel({
       setSecondFloor(null);
       setSecondFloorZoom(1);
       setSecondFloorPan({ x: 0, y: 0 });
-      setSecondFloorBalconySelected(false);
-      setSecondFloorViewMode('floorplan');
+      setSecondFloorViewMode('unitplan');
       setSecondFloorBalconyPoint(1);
+      setSecondFloorSelectedPoint(null);
+      setSecondFloorIsUnitPlan(true);
     } else {
-      // Selecting a new second floor
+      // Selecting a new second floor - reset zoom for both floors
       setSecondFloor(floorData);
       setSecondFloorZoom(1);
       setSecondFloorPan({ x: 0, y: 0 });
+      // Also reset first floor zoom when comparing
+      setFirstFloorZoom(1);
+      setFirstFloorPan({ x: 0, y: 0 });
       
       // If currently in balcony view mode, keep the new floor in balcony view
       if (currentlyInBalconyMode) {
-        setSecondFloorBalconySelected(true);
+        const newFloorType = getFloorType(floorNum);
+        const newFloorTotalPoints = getTotalBalconyPoints(newFloorType);
+        // Use the same point if available, otherwise use point 1
+        const newPoint = firstFloorBalconyPoint <= newFloorTotalPoints ? firstFloorBalconyPoint : 1;
         setSecondFloorViewMode('balcony');
-        setSecondFloorBalconyPoint(1); // Start at Point 1 for new floor
+        setSecondFloorBalconyPoint(newPoint);
+        setSecondFloorSelectedPoint(newPoint);
       } else {
-        setSecondFloorBalconySelected(false);
-        setSecondFloorViewMode('floorplan');
+        setSecondFloorViewMode('unitplan');
         setSecondFloorBalconyPoint(1);
+        setSecondFloorSelectedPoint(null);
       }
+      // Sync plan type with first floor
+      setSecondFloorIsUnitPlan(firstFloorIsUnitPlan);
     }
     
     if ('vibrate' in navigator) navigator.vibrate(30);
-  }, [firstFloor, secondFloor, isFloorSelectable, isInBalconyViewMode]);
+  }, [firstFloor, secondFloor, isFloorSelectable, isInBalconyViewMode, firstFloorIsUnitPlan, firstFloorBalconyPoint]);
 
   const getFloorFillColor = useCallback((floor) => {
     const isSecondFloor = secondFloor && secondFloor.id === floor.path_id;
@@ -977,6 +1252,12 @@ export default function FloorComparisonPanel({
   const hasSecondFloor = !!secondFloor;
   const hasBothFloors = hasFirstFloor && hasSecondFloor;
 
+  // Get floor types and total points for each floor
+  const firstFloorType = hasFirstFloor ? getFloorType(firstFloor.info.floorNumber) : "multiple";
+  const secondFloorType = hasSecondFloor ? getFloorType(secondFloor.info.floorNumber) : "multiple";
+  const firstFloorTotalPoints = getTotalBalconyPoints(firstFloorType);
+  const secondFloorTotalPoints = getTotalBalconyPoints(secondFloorType);
+
   return createPortal(
     <div 
       ref={overlayRef}
@@ -1022,7 +1303,7 @@ export default function FloorComparisonPanel({
           >
             
             <div className="flex items-center justify-between mb-4 flex-shrink-0">
-              <div>
+              <div className="flex items-center gap-6">
                 <h3 
                   ref={headerRef}
                   className="font-bold text-[#000000]"
@@ -1036,19 +1317,27 @@ export default function FloorComparisonPanel({
                     <>Floor Plan Comparison</>
                   )}
                 </h3>
-                {/* Balcony view indicator */}
-                {(firstFloorViewMode === 'balcony' || secondFloorViewMode === 'balcony') && (
-                  <p className="text-sm text-blue-600 mt-1 normal-case">
-                    {firstFloorViewMode === 'balcony' && secondFloorViewMode === 'balcony' 
-                      ? "Viewing balconies for both floors"
-                      : firstFloorViewMode === 'balcony' 
-                        ? "Viewing balcony for first floor"
-                        : "Viewing balcony for second floor"
-                    }
-                    <span className="text-gray-500 ml-2">• Click thumbnail to switch back</span>
-                  </p>
+                {/* Plan Type Toggle - in header, only show when not in balcony view */}
+                {hasFirstFloor && firstFloorViewMode !== 'balcony' && (
+                  <PlanTypeToggle
+                    isUnitPlan={firstFloorIsUnitPlan}
+                    onToggle={handleFirstFloorPlanToggle}
+                    borderColor="#C19A40"
+                  />
                 )}
               </div>
+              {/* Balcony view indicator */}
+              {(firstFloorViewMode === 'balcony' || secondFloorViewMode === 'balcony') && (
+                <p className="text-sm text-green-600 normal-case">
+                  {firstFloorViewMode === 'balcony' && secondFloorViewMode === 'balcony' 
+                    ? "Viewing balconies for both floors"
+                    : firstFloorViewMode === 'balcony' 
+                      ? "Viewing balcony for first floor"
+                      : "Viewing balcony for second floor"
+                  }
+                  <span className="text-gray-500 ml-2">• Click thumbnail to switch back</span>
+                </p>
+              )}
             </div>
 
             <div className="flex-1 min-h-0">
@@ -1060,43 +1349,49 @@ export default function FloorComparisonPanel({
                 >
                   {/* First Floor */}
                   <div className="bg-white rounded-lg shadow-sm relative overflow-hidden flex flex-col border-2" style={{ borderColor: '#C19A40' }}>
-                    {/* Zoom Controls */}
-                    <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
-                      <button
-                        onClick={() => zoomIn(setFirstFloorZoom)}
-                        className="w-8 h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
-                        title="Zoom In"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => zoomOut(setFirstFloorZoom, setFirstFloorPan, firstFloorZoom, firstFloorPan)}
-                        className="w-8 h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
-                        title="Zoom Out"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => resetZoom(setFirstFloorZoom, setFirstFloorPan)}
-                        className="w-8 h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
-                        title="Reset Zoom"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                      </button>
-                    </div>
-                    {/* Zoom indicator */}
-                    <div className="absolute bottom-3 left-3 z-20 bg-white/80 px-2 py-1 rounded text-xs text-gray-600">
-                      {Math.round(firstFloorZoom * 100)}%
-                    </div>
+                    {/* Zoom Controls - Hide in balcony view */}
+                    {firstFloorViewMode !== 'balcony' && (
+                      <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                        <button
+                          onClick={() => zoomIn(setFirstFloorZoom)}
+                          className="w-8 h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
+                          title="Zoom In"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => zoomOut(setFirstFloorZoom, setFirstFloorPan, firstFloorZoom, firstFloorPan)}
+                          className="w-8 h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
+                          title="Zoom Out"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => resetZoom(setFirstFloorZoom, setFirstFloorPan)}
+                          className="w-8 h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
+                          title="Reset Zoom"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+                    {/* Zoom indicator - Hide in balcony view */}
+                    {firstFloorViewMode !== 'balcony' && (
+                      <div className="absolute bottom-3 left-3 z-20 bg-white/80 px-2 py-1 rounded text-xs text-gray-600">
+                        {Math.round(firstFloorZoom * 100)}%
+                      </div>
+                    )}
                     {/* View mode indicator */}
                     <div className="absolute top-3 left-3 z-20 bg-[#C19A40] text-white px-2 py-1 rounded text-xs">
-                      {firstFloorViewMode === 'balcony' ? `Balcony View` : 'Floor Plan'}
+                      {firstFloorViewMode === 'balcony' 
+                        ? `Balcony View - Point ${firstFloorBalconyPoint}` 
+                        : (firstFloorIsUnitPlan ? 'Unit Plan' : 'Floor Plan')}
                     </div>
                     
                     {/* Main Content Area with Thumbnail */}
@@ -1104,16 +1399,27 @@ export default function FloorComparisonPanel({
                       {/* Main View Area */}
                       <div 
                         className="relative flex-1 min-h-0 overflow-hidden"
-                        onMouseDown={(e) => handleMouseDown(e, 'first')}
-                        onWheel={(e) => handleWheel(e, 'first')}
-                        style={{ cursor: firstFloorZoom > 1 ? (isDragging && activeDragFloor === 'first' ? 'grabbing' : 'grab') : 'zoom-in' }}
+                        onMouseDown={(e) => firstFloorViewMode !== 'balcony' && handleMouseDown(e, 'first')}
+                        onWheel={(e) => firstFloorViewMode !== 'balcony' && handleWheel(e, 'first')}
+                        onClick={(e) => firstFloorViewMode !== 'balcony' && handleImageClick(e, 'first')}
+                        style={{ cursor: firstFloorViewMode === 'balcony' ? 'default' : (firstFloorZoom > 1 ? (isDragging && activeDragFloor === 'first' ? 'grabbing' : 'grab') : 'zoom-in') }}
                       >
                         <div 
                           className="w-full h-full flex items-center justify-center p-2"
                           style={{ minHeight: '100%' }}
                         >
-                          {/* Show Floor Plan or Balcony Carousel based on view mode */}
-                          {firstFloorViewMode === 'floorplan' ? (
+                          {/* Show Floor Plan, Unit Plan, or Balcony Carousel based on view mode */}
+                          {firstFloorViewMode === 'balcony' ? (
+                            <BalconyViewCarousel
+                              floorNumber={firstFloor.info.floorNumber}
+                              currentPoint={firstFloorBalconyPoint}
+                              onPointChange={(point) => {
+                                setFirstFloorBalconyPoint(point);
+                                setFirstFloorSelectedPoint(point);
+                              }}
+                              totalPoints={firstFloorTotalPoints}
+                            />
+                          ) : (
                             <div
                               className="relative"
                               style={{ 
@@ -1124,8 +1430,8 @@ export default function FloorComparisonPanel({
                               }}
                             >
                               <img
-                                src={getFloorPlanImage(firstFloor.info.floorNumber)}
-                                alt={`Floor ${firstFloor.info.floorNumber} Plan`}
+                                src={getFloorPlanImage(firstFloor.info.floorNumber, firstFloorIsUnitPlan)}
+                                alt={`Floor ${firstFloor.info.floorNumber} ${firstFloorIsUnitPlan ? 'Unit' : 'Floor'} Plan`}
                                 className="block select-none"
                                 style={{
                                   maxWidth: '100%',
@@ -1136,22 +1442,15 @@ export default function FloorComparisonPanel({
                                 }}
                                 draggable={false}
                               />
-                              {/* Balcony Overlay - only show on floor plan view */}
-                              <BalconyOverlay
-                                onBalconyClick={handleFirstFloorBalconyClick}
-                                isSelected={firstFloorBalconySelected}
-                                floorType={getFloorType(firstFloor.info.floorNumber)}
-                              />
+                              {/* Unit Plan Overlay - only show on unit plan view */}
+                              {firstFloorIsUnitPlan && (
+                                <UnitPlanOverlay
+                                  floorType={firstFloorType}
+                                  onRegionClick={handleFirstFloorRegionClick}
+                                  selectedPoint={firstFloorSelectedPoint}
+                                />
+                              )}
                             </div>
-                          ) : (
-                            <BalconyViewCarousel
-                              floorNumber={firstFloor.info.floorNumber}
-                              currentPoint={firstFloorBalconyPoint}
-                              onPointChange={setFirstFloorBalconyPoint}
-                              zoom={firstFloorZoom}
-                              pan={firstFloorPan}
-                              isDragging={isDragging && activeDragFloor === 'first'}
-                            />
                           )}
                         </div>
                       </div>
@@ -1159,10 +1458,10 @@ export default function FloorComparisonPanel({
                       {/* Thumbnail Area - Bottom Right */}
                       {firstFloorViewMode === 'balcony' && (
                         <Thumbnail
-                          imageSrc={getFloorPlanImage(firstFloor.info.floorNumber)}
+                          imageSrc={getFloorPlanImage(firstFloor.info.floorNumber, true)}
                           onClick={handleFirstFloorThumbnailClick}
                           borderColor="#C19A40"
-                          label="Floor Plan"
+                          label="Unit Plan"
                         />
                       )}
                     </div>
@@ -1171,43 +1470,49 @@ export default function FloorComparisonPanel({
                   {/* Second Floor (if selected) */}
                   {hasSecondFloor && (
                     <div className="bg-white rounded-lg shadow-sm relative overflow-hidden flex flex-col border-2" style={{ borderColor: '#BDD1B1' }}>
-                      {/* Zoom Controls */}
-                      <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
-                        <button
-                          onClick={() => zoomIn(setSecondFloorZoom)}
-                          className="w-8 h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
-                          title="Zoom In"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
-                          </svg>
-                        </button>
-                        <button
-                          onClick={() => zoomOut(setSecondFloorZoom, setSecondFloorPan, secondFloorZoom, secondFloorPan)}
-                          className="w-8 h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
-                          title="Zoom Out"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
-                          </svg>
-                        </button>
-                        <button
-                          onClick={() => resetZoom(setSecondFloorZoom, setSecondFloorPan)}
-                          className="w-8 h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
-                          title="Reset Zoom"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                          </svg>
-                        </button>
-                      </div>
-                      {/* Zoom indicator */}
-                      <div className="absolute bottom-3 left-3 z-20 bg-white/80 px-2 py-1 rounded text-xs text-gray-600">
-                        {Math.round(secondFloorZoom * 100)}%
-                      </div>
+                      {/* Zoom Controls - Hide in balcony view */}
+                      {secondFloorViewMode !== 'balcony' && (
+                        <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                          <button
+                            onClick={() => zoomIn(setSecondFloorZoom)}
+                            className="w-8 h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
+                            title="Zoom In"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => zoomOut(setSecondFloorZoom, setSecondFloorPan, secondFloorZoom, secondFloorPan)}
+                            className="w-8 h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
+                            title="Zoom Out"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => resetZoom(setSecondFloorZoom, setSecondFloorPan)}
+                            className="w-8 h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
+                            title="Reset Zoom"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                      {/* Zoom indicator - Hide in balcony view */}
+                      {secondFloorViewMode !== 'balcony' && (
+                        <div className="absolute bottom-3 left-3 z-20 bg-white/80 px-2 py-1 rounded text-xs text-gray-600">
+                          {Math.round(secondFloorZoom * 100)}%
+                        </div>
+                      )}
                       {/* View mode indicator */}
                       <div className="absolute top-3 left-3 z-20 bg-[#BDD1B1] text-gray-800 px-2 py-1 rounded text-xs">
-                        {secondFloorViewMode === 'balcony' ? `Balcony View` : 'Floor Plan'}
+                        {secondFloorViewMode === 'balcony' 
+                          ? `Balcony View - Point ${secondFloorBalconyPoint}` 
+                          : (secondFloorIsUnitPlan ? 'Unit Plan' : 'Floor Plan')}
                       </div>
                       
                       {/* Main Content Area with Thumbnail */}
@@ -1215,16 +1520,27 @@ export default function FloorComparisonPanel({
                         {/* Main View Area */}
                         <div 
                           className="relative flex-1 min-h-0 overflow-hidden"
-                          onMouseDown={(e) => handleMouseDown(e, 'second')}
-                          onWheel={(e) => handleWheel(e, 'second')}
-                          style={{ cursor: secondFloorZoom > 1 ? (isDragging && activeDragFloor === 'second' ? 'grabbing' : 'grab') : 'zoom-in' }}
+                          onMouseDown={(e) => secondFloorViewMode !== 'balcony' && handleMouseDown(e, 'second')}
+                          onWheel={(e) => secondFloorViewMode !== 'balcony' && handleWheel(e, 'second')}
+                          onClick={(e) => secondFloorViewMode !== 'balcony' && handleImageClick(e, 'second')}
+                          style={{ cursor: secondFloorViewMode === 'balcony' ? 'default' : (secondFloorZoom > 1 ? (isDragging && activeDragFloor === 'second' ? 'grabbing' : 'grab') : 'zoom-in') }}
                         >
                           <div 
                             className="w-full h-full flex items-center justify-center p-2"
                             style={{ minHeight: '100%' }}
                           >
-                            {/* Show Floor Plan or Balcony Carousel based on view mode */}
-                            {secondFloorViewMode === 'floorplan' ? (
+                            {/* Show Floor Plan, Unit Plan, or Balcony Carousel based on view mode */}
+                            {secondFloorViewMode === 'balcony' ? (
+                              <BalconyViewCarousel
+                                floorNumber={secondFloor.info.floorNumber}
+                                currentPoint={secondFloorBalconyPoint}
+                                onPointChange={(point) => {
+                                  setSecondFloorBalconyPoint(point);
+                                  setSecondFloorSelectedPoint(point);
+                                }}
+                                totalPoints={secondFloorTotalPoints}
+                              />
+                            ) : (
                               <div
                                 className="relative"
                                 style={{ 
@@ -1235,8 +1551,8 @@ export default function FloorComparisonPanel({
                                 }}
                               >
                                 <img
-                                  src={getFloorPlanImage(secondFloor.info.floorNumber)}
-                                  alt={`Floor ${secondFloor.info.floorNumber} Plan`}
+                                  src={getFloorPlanImage(secondFloor.info.floorNumber, secondFloorIsUnitPlan)}
+                                  alt={`Floor ${secondFloor.info.floorNumber} ${secondFloorIsUnitPlan ? 'Unit' : 'Floor'} Plan`}
                                   className="block select-none"
                                   style={{
                                     maxWidth: '100%',
@@ -1247,22 +1563,15 @@ export default function FloorComparisonPanel({
                                   }}
                                   draggable={false}
                                 />
-                                {/* Balcony Overlay - only show on floor plan view */}
-                                <BalconyOverlay
-                                  onBalconyClick={handleSecondFloorBalconyClick}
-                                  isSelected={secondFloorBalconySelected}
-                                  floorType={getFloorType(secondFloor.info.floorNumber)}
-                                />
+                                {/* Unit Plan Overlay - only show on unit plan view */}
+                                {secondFloorIsUnitPlan && (
+                                  <UnitPlanOverlay
+                                    floorType={secondFloorType}
+                                    onRegionClick={handleSecondFloorRegionClick}
+                                    selectedPoint={secondFloorSelectedPoint}
+                                  />
+                                )}
                               </div>
-                            ) : (
-                              <BalconyViewCarousel
-                                floorNumber={secondFloor.info.floorNumber}
-                                currentPoint={secondFloorBalconyPoint}
-                                onPointChange={setSecondFloorBalconyPoint}
-                                zoom={secondFloorZoom}
-                                pan={secondFloorPan}
-                                isDragging={isDragging && activeDragFloor === 'second'}
-                              />
                             )}
                           </div>
                         </div>
@@ -1270,10 +1579,10 @@ export default function FloorComparisonPanel({
                         {/* Thumbnail Area - Bottom Right */}
                         {secondFloorViewMode === 'balcony' && (
                           <Thumbnail
-                            imageSrc={getFloorPlanImage(secondFloor.info.floorNumber)}
+                            imageSrc={getFloorPlanImage(secondFloor.info.floorNumber, true)}
                             onClick={handleSecondFloorThumbnailClick}
                             borderColor="#BDD1B1"
-                            label="Floor Plan"
+                            label="Unit Plan"
                           />
                         )}
                       </div>
