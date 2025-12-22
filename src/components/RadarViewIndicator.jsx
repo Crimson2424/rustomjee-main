@@ -32,28 +32,28 @@ const DIRECTION_MAP = {
 };
 
 // Position configuration for radar on each floor type's unit plan image
-// Adjust these values to position the radar correctly on each unit plan
-// top/left are CSS values for positioning, size is the radar size in pixels
+// Using percentage-based width like Unit Plan SVG overlays for consistent scaling
+// top/left are percentage positions, width is percentage of parent container
 export const RADAR_POSITION_CONFIG = {
   "1st": {
-    top: "53%",
-    left: "79%",
-    size: 390,
+    top: "48%",
+    left: "84%",
+    width: "75%",  // Percentage width like unit plan SVGs
   },
   "2nd-9th": {
-    top: "43%",
-    left: "59.8%",
-    size: 340,
+    top: "46%",
+    left: "61%",
+    width: "60%",
   },
   "16th": {
     top: "43%",
     left: "64%",
-    size: 340,
+    width: "40%",
   },
   "multiple": {
-    top: "55%",
-    left: "79%",
-    size: 390,
+    top: "56%",
+    left: "84%",
+    width: "75%",
   }
 };
 
@@ -71,12 +71,14 @@ export const getRadarPositionConfig = (floorType) => {
 export default function RadarViewIndicator({ 
   currentPoint = 1, 
   floorType = "multiple",
-  size = 120,
   className = ""
 }) {
   const radarRef = useRef(null);
   const prevPointRef = useRef(currentPoint);
   const prevFloorTypeRef = useRef(floorType);
+
+  // Get the position config for this floor type
+  const positionConfig = getRadarPositionConfig(floorType);
 
   // Animate entire radar rotation when point changes
   useEffect(() => {
@@ -124,10 +126,17 @@ export default function RadarViewIndicator({
       ref={radarRef}
       xmlns="http://www.w3.org/2000/svg" 
       viewBox="0 0 400 400"
-      width={size} 
-      height={size}
-      className={className}
-      style={{ overflow: 'visible' }}
+      className={`absolute pointer-events-none ${className}`}
+      style={{
+        top: positionConfig.top,
+        left: positionConfig.left,
+        width: positionConfig.width,
+        height: "auto",
+        transform: "translate(-50%, -50%)",
+        overflow: "visible",
+        zIndex: 15,
+      }}
+      preserveAspectRatio="xMidYMid meet"
     >
       <defs>
         {/* Gradient for the cone spreading effect */}
@@ -142,15 +151,9 @@ export default function RadarViewIndicator({
           <stop offset="0%" stopColor="#C4A35A" stopOpacity="0.8"/>
           <stop offset="100%" stopColor="#C4A35A" stopOpacity="0"/>
         </linearGradient>
-        
-        {/* Radial gradient for the eye glow */}
-        <radialGradient id="eyeGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#C4A35A" stopOpacity="0.8"/>
-          <stop offset="100%" stopColor="#C4A35A" stopOpacity="0"/>
-        </radialGradient>
       </defs>
       
-      {/* UNIFIED RADAR - Eye and Cone together, rotates as one unit */}
+      {/* CONE RADAR - rotates as one unit */}
       
       {/* Main cone shape */}
       <path 
@@ -178,27 +181,8 @@ export default function RadarViewIndicator({
       {/* Dashed arc */}
       <ellipse cx="200" cy="340" rx="50" ry="15" fill="none" stroke="#C4A35A" strokeWidth="1" strokeOpacity="0.2" strokeDasharray="5,5"/>
       
-      {/* EYE - At the tip of the cone */}
-      {/* Eye glow background */}
-      <circle cx="200" cy="200" r="18" fill="url(#eyeGlow)"/>
-      
-      {/* Eye shape - almond pointing in same direction as cone (vertical) */}
-      <path 
-        d="M 200 175 Q 215 200 200 225 Q 185 200 200 175 Z"
-        fill="none" 
-        stroke="#C4A35A" 
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-      
-      {/* Eye - iris circle */}
-      <circle cx="200" cy="200" r="8" fill="none" stroke="#C4A35A" strokeWidth="1.5"/>
-      
-      {/* Eye - pupil */}
-      <circle cx="200" cy="200" r="3" fill="#C4A35A"/>
-      
-      {/* Eye - highlight */}
-      <circle cx="202" cy="198" r="1.5" fill="#fff" fillOpacity="0.8"/>
+      {/* Center point indicator (small dot where cone originates) */}
+      <circle cx="200" cy="200" r="4" fill="#C4A35A" fillOpacity="0.8"/>
     </svg>
   );
 }

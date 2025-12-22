@@ -9,29 +9,24 @@ const HomeNav = () => {
       <Loader />
 
       <div className="w-full h-screen overflow-hidden bg-[#7fa4c9] relative">
-        
         {/* Background Image - Fixed size, anchored to bottom center */}
         <div
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{
             backgroundImage: 'url("/images/SkyToBuilding1.2.2.png")',
-            backgroundPosition: 'bottom center',
-            backgroundSize: 'cover',  // Keeps original image size
-            backgroundRepeat: 'no-repeat'
-            
+            backgroundPosition: "bottom center",
+            backgroundSize: "cover", // Keeps original image size
+            backgroundRepeat: "no-repeat",
           }}
         />
 
         {/* Logo - Top Center */}
-        <div
-          className="absolute top-3 left-1/2 -translate-x-1/2 z-40 cursor-pointer hover:scale-105 transition-transform duration-300 text-center font-balgin font-bold uppercase flex flex-col "
-        >
+        <div className="absolute top-3 sm:top-10 sm:left-50 md:top-10 md:left-60 lg:left-1/2 -translate-x-1/2 z-40 cursor-pointer hover:scale-105 transition-transform duration-300 font-balgin font-bold uppercase flex flex-col ">
           <img
-            src="/images/logo.png"
+            src="/images/Cliff-tower.png"
             alt="Rustomjee"
-            className="h-12 xl:h-18 lg:h-16 w-auto 3xl:h-30 4xl:h-45"
+            className={`w-auto h-12 sm:h-20 md:h-25 lg:h-26 xl:h-35 2xl:h-40 3xl:h-60 4xl:h-90`}
           />
-          <p className="text-2xl ">Cliff Tower</p>
         </div>
 
         {/* RERA Image - Top Right */}

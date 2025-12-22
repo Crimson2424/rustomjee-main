@@ -128,7 +128,7 @@ const Home = () => {
     startValue= "70% top";
     midTextStart="40% top";
     bandraStart = "20% top";
-    bandraHeight = "140vh";
+    bandraHeight = "200vh";
   }
   else if (width >= 640) {
     scaleValue = 1.03;
@@ -333,7 +333,7 @@ const Home = () => {
             </div>
 
             {/* OVERLAY CONTAINER: Covers entire Section 1 */}
-            <div className={`absolute top-0 left-0 w-full h-[200vh] lg:h-[] max-lg:h-[${bandraHeight}] max-md:h-[${bandraHeight}] max-xl:h-[200vh] max-2xl:h-[155vh] 3xl:h-[200vh] z-60 pointer-events-none flex flex-col`}>
+            <div className={`absolute top-0 left-0 w-full h-[200vh]  max-lg:h-[200vh] max-md:h-[200vh] max-xl:h-[160vh] max-2xl:h-[155vh] 3xl:h-[200vh] z-60 pointer-events-none flex flex-col`}>
             
               {/* --- TOP HALF: INTRO TEXT & SCROLL --- */}
               <div className="flex-1 relative w-full flex flex-col justify-end pb-10">
@@ -402,8 +402,8 @@ const Home = () => {
               ref={bottomLogo}
               className="absolute top-120 max-md:top-55 max-lg:top-100 3xl:top-210 4xl:top-380 3xl:text-7xl 4xl:text-9xl left-1/2 overflow-hidden -translate-x-1/2 text-5xl max-md:text-2xl max-lg:text-2xl text-black font-bold text-center z-30 opacity-0 mt-10"
             >
-              <img src="/images/logo.png" alt="Logo" className="h-20 w-auto max-md:h-10 max-lg:h-10 3xl:h-30 4xl:h-60 mx-auto mb-4" />
-              <p>CLIFF TOWER</p>
+              <img src="/images/Cliff-tower.png" alt="Logo" className="h-60 w-auto max-md:h-20 max-lg:h-30  3xl:h-70 4xl:h-80 mx-auto mb-4 " />
+              
             </div>
 
             <div className="relative w-full">

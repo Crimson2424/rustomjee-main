@@ -2,7 +2,9 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import gsap from "gsap";
-import RadarViewIndicator, { getRadarPositionConfig } from "./RadarViewIndicator";
+import RadarViewIndicator, {
+  getRadarPositionConfig,
+} from "./RadarViewIndicator";
 
 // Unit Plan SVG Configuration for each floor type
 // Each entry contains the SVG paths and their corresponding balcony view points
@@ -17,7 +19,6 @@ const UNIT_PLAN_SVG_CONFIG = {
         viewBox: "0 0 55.473228 49.194225",
         transform: "translate(-221.17132,-9.9018209)",
         path: "m 276.60621,9.9171724 -37.04355,-0.015351 -0.69083,0.2763296 -0.55266,0.429847 -0.4759,0.506605 -0.16887,0.291681 -0.19957,0.521956 -0.0768,0.583364 0.0307,15.581933 -1.96502,0.245629 -1.10532,0.184219 -1.79614,0.598715 -1.70403,0.782934 -0.99786,0.521956 -0.76758,0.491255 -0.98251,0.660119 -0.79829,0.62942 -0.87504,0.813636 -0.56801,0.568013 -0.81364,0.936451 -0.56801,0.721529 -0.53731,0.875043 -0.59872,0.967155 -0.52195,1.089967 -0.49125,1.136023 -0.4145,1.013211 -0.32238,1.105318 -0.42985,1.949662 v 3.208496 l 7.66843,-0.01236 -0.0543,12.516117 46.40625,-0.03256 -0.0593,-26.019037 1.51215,-0.0077 V 9.9094998 Z",
-        // Position will be adjusted by user - these are initial estimates
         position: { top: "8.0%", left: "77.6%", width: "13.28%" },
       },
       {
@@ -129,6 +130,7 @@ const UNIT_PLAN_SVG_CONFIG = {
     ],
   },
 };
+
 // Single Unit Plan SVG Region Component
 function UnitPlanSvgRegion({
   region,
@@ -167,7 +169,6 @@ function UnitPlanSvgRegion({
   const handleClick = (e) => {
     e.stopPropagation();
 
-    // Click pulse animation
     if (pathRef.current) {
       gsap.to(pathRef.current, {
         scale: 1.05,
@@ -182,7 +183,6 @@ function UnitPlanSvgRegion({
     onRegionClick?.(region.point);
   };
 
-  // Update colors when selection changes
   useEffect(() => {
     if (pathRef.current) {
       gsap.to(pathRef.current, {
@@ -234,7 +234,7 @@ function UnitPlanSvgRegion({
   );
 }
 
-// Unit Plan Overlay Component - renders all SVG regions for a floor type
+// Unit Plan Overlay Component
 function UnitPlanOverlay({
   floorType = "multiple",
   onRegionClick,
@@ -257,45 +257,151 @@ function UnitPlanOverlay({
   );
 }
 
-// Get the total number of balcony points for a floor type
 const getTotalBalconyPoints = (floorType) => {
   const config =
     UNIT_PLAN_SVG_CONFIG[floorType] || UNIT_PLAN_SVG_CONFIG["multiple"];
   return config.totalPoints;
 };
 
-// Balcony View Carousel Component
+// Balcony Point Tabs Component - RESPONSIVE: smaller on mobile, aligned right
+function BalconyPointTabs({
+  currentPoint,
+  onPointChange,
+  totalPoints,
+  accentColor = "#C19A40",
+  isInteractive = true,
+}) {
+  const tabsRef = useRef([]);
+  const maxPoints = 4;
+
+  const handleTabClick = (point) => {
+    if (isInteractive && point <= totalPoints) {
+      if (tabsRef.current[point - 1]) {
+        gsap.to(tabsRef.current[point - 1], {
+          scale: 0.95,
+          duration: 0.1,
+          yoyo: true,
+          repeat: 1,
+          ease: "power2.inOut",
+        });
+      }
+      onPointChange(point);
+      if ("vibrate" in navigator) navigator.vibrate(20);
+    }
+  };
+
+  return (
+    <div className="absolute sm:top-0 right-0 z-30 flex justify-end sm:left-0 sm:right-0 sm:justify-center lg:top-10 xl:top-0">
+      <div className="flex bg-white/90 backdrop-blur-sm rounded-bl-lg sm:rounded-b-lg shadow-md overflow-hidden">
+        {Array.from({ length: maxPoints }, (_, i) => i + 1).map(
+          (point, index) => {
+            const isAvailable = point <= totalPoints;
+            const isActive = point === currentPoint;
+            const showAsActive = isActive && isAvailable;
+            const showAsUnavailableActive = isActive && !isAvailable;
+
+            return (
+              <button
+                key={point}
+                ref={(el) => (tabsRef.current[index] = el)}
+                onClick={() => handleTabClick(point)}
+                disabled={!isInteractive || !isAvailable}
+                className={`
+                relative px-2 py-1 text-xs sm:px-4 sm:py-2 sm:text-sm font-medium transition-all duration-200
+                ${
+                  isInteractive && isAvailable
+                    ? "cursor-pointer"
+                    : "cursor-not-allowed"
+                }
+                ${
+                  showAsActive
+                    ? "text-white"
+                    : showAsUnavailableActive
+                    ? "text-white"
+                    : isAvailable
+                    ? isInteractive
+                      ? "text-gray-600 hover:text-gray-800 hover:bg-gray-100"
+                      : "text-gray-500"
+                    : "text-gray-300"
+                }
+              `}
+                style={{
+                  backgroundColor: showAsActive
+                    ? accentColor
+                    : showAsUnavailableActive
+                    ? "#9CA3AF"
+                    : "transparent",
+                  minWidth: "28px",
+                }}
+                title={
+                  !isInteractive
+                    ? `Viewing Point ${point}`
+                    : isAvailable
+                    ? `View Point ${point}`
+                    : `Point ${point} not available for this floor`
+                }
+              >
+                <span className="relative z-10">{point}</span>
+                {showAsActive && (
+                  <div
+                    className="absolute bottom-0 left-0 right-0 h-0.5"
+                    style={{ backgroundColor: accentColor }}
+                  />
+                )}
+                {!isAvailable && !showAsUnavailableActive && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-4 sm:w-6 h-px bg-gray-300 rotate-45" />
+                  </div>
+                )}
+              </button>
+            );
+          }
+        )}
+      </div>
+    </div>
+  );
+}
+// Balcony View Carousel Component - RESPONSIVE
 function BalconyViewCarousel({
   floorNumber,
   currentPoint,
   onPointChange,
-  totalPoints = 4, // Now dynamic based on floor type
+  totalPoints = 4,
+  accentColor = "#C19A40",
+  isMaster = true,
+  masterTotalPoints = 4,
 }) {
   const imageRef = useRef(null);
   const prevButtonRef = useRef(null);
   const nextButtonRef = useRef(null);
-  const dotsRef = useRef([]);
+  const [lastValidPoint, setLastValidPoint] = useState(1);
 
-  // Generate the image path based on floor number and current point
+  useEffect(() => {
+    if (currentPoint <= totalPoints) {
+      setLastValidPoint(currentPoint);
+    }
+  }, [currentPoint, totalPoints]);
+
+  const isViewAvailable = currentPoint <= totalPoints;
+
   const getBalconyViewImage = (floor, point) => {
     return `/balcony-views/Point ${point}/Floor ${floor}.webp`;
   };
 
-  // Animate image on point change
   useEffect(() => {
-    if (imageRef.current) {
+    if (imageRef.current && isViewAvailable) {
       gsap.fromTo(
         imageRef.current,
         { opacity: 0, scale: 1.02 },
         { opacity: 1, scale: 1, duration: 0.4, ease: "power2.out" }
       );
     }
-  }, [currentPoint]);
+  }, [currentPoint, isViewAvailable]);
 
   const handlePrevPoint = (e) => {
     e.stopPropagation();
+    if (!isMaster) return;
 
-    // Button press animation
     if (prevButtonRef.current) {
       gsap.to(prevButtonRef.current, {
         scale: 0.9,
@@ -306,15 +412,15 @@ function BalconyViewCarousel({
       });
     }
 
-    const newPoint = currentPoint === 1 ? totalPoints : currentPoint - 1;
+    const newPoint = currentPoint === 1 ? masterTotalPoints : currentPoint - 1;
     onPointChange(newPoint);
     if ("vibrate" in navigator) navigator.vibrate(20);
   };
 
   const handleNextPoint = (e) => {
     e.stopPropagation();
+    if (!isMaster) return;
 
-    // Button press animation
     if (nextButtonRef.current) {
       gsap.to(nextButtonRef.current, {
         scale: 0.9,
@@ -325,125 +431,126 @@ function BalconyViewCarousel({
       });
     }
 
-    const newPoint = currentPoint === totalPoints ? 1 : currentPoint + 1;
+    const newPoint = currentPoint === masterTotalPoints ? 1 : currentPoint + 1;
     onPointChange(newPoint);
     if ("vibrate" in navigator) navigator.vibrate(20);
   };
 
-  const handleDotClick = (point) => {
-    // Animate the clicked dot
-    const dotIndex = point - 1;
-    if (dotsRef.current[dotIndex]) {
-      gsap.to(dotsRef.current[dotIndex], {
-        scale: 1.3,
-        duration: 0.15,
-        yoyo: true,
-        repeat: 1,
-        ease: "power2.inOut",
-      });
-    }
-
-    onPointChange(point);
-    if ("vibrate" in navigator) navigator.vibrate(20);
-  };
-
-  // Animate dots when currentPoint changes
-  useEffect(() => {
-    dotsRef.current.forEach((dot, index) => {
-      if (dot) {
-        const isActive = index === currentPoint - 1;
-        gsap.to(dot, {
-          width: isActive ? 24 : 6,
-          backgroundColor: isActive ? "#C19A40" : "rgba(193, 154, 64, 0.3)",
-          duration: 0.3,
-          ease: "power2.out",
-        });
-      }
-    });
-  }, [currentPoint]);
-
   return (
     <div className="relative w-full h-full">
-      {/* Balcony View Image - No zoom */}
-      <div ref={imageRef} className="relative inline-block w-full h-full">
-        <img
-          src={getBalconyViewImage(floorNumber, currentPoint)}
-          alt={`Floor ${floorNumber} Balcony View - Point ${currentPoint}`}
-          className="block select-none w-full h-full object-contain"
-          draggable={false}
-        />
-      </div>
+      {/* Balcony Point Tabs - aligned right on mobile */}
+      <BalconyPointTabs
+        currentPoint={currentPoint}
+        onPointChange={onPointChange}
+        totalPoints={totalPoints}
+        accentColor={accentColor}
+        isInteractive={isMaster}
+      />
 
-      {/* Left Arrow - Minimal */}
-      <button
-        ref={prevButtonRef}
-        onClick={handlePrevPoint}
-        className="absolute left-3 top-1/2 -translate-y-1/2 z-30 w-8 h-8 bg-[#FFFBF5]/80 hover:bg-[#FFFBF5] border border-[#C19A40]/30 rounded-full flex items-center justify-center cursor-pointer group"
-        title="Previous viewpoint"
+      {/* Balcony View Image - smaller top padding on mobile */}
+      <div
+        ref={imageRef}
+        className="relative inline-block w-full h-full pt-6 sm:pt-10"
       >
-        <svg
-          className="w-4 h-4 text-[#C19A40] group-hover:text-[#A37F2D]"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 19l-7-7 7-7"
+        {isViewAvailable ? (
+          <img
+            src={getBalconyViewImage(floorNumber, currentPoint)}
+            alt={`Floor ${floorNumber} Balcony View - Point ${currentPoint}`}
+            className="block select-none w-full h-full object-contain"
+            draggable={false}
           />
-        </svg>
-      </button>
-
-      {/* Right Arrow - Minimal */}
-      <button
-        ref={nextButtonRef}
-        onClick={handleNextPoint}
-        className="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-8 h-8 bg-[#FFFBF5]/80 hover:bg-[#FFFBF5] border border-[#C19A40]/30 rounded-full flex items-center justify-center cursor-pointer group"
-        title="Next viewpoint"
-      >
-        <svg
-          className="w-4 h-4 text-[#C19A40] group-hover:text-[#A37F2D]"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 5l7 7-7 7"
-          />
-        </svg>
-      </button>
-
-      {/* Point Indicator - Minimal line style */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5">
-        {Array.from({ length: totalPoints }, (_, i) => i + 1).map(
-          (point, index) => (
-            <button
-              key={point}
-              ref={(el) => (dotsRef.current[index] = el)}
-              onClick={() => handleDotClick(point)}
-              className="h-1 rounded-full cursor-pointer"
-              style={{
-                width: currentPoint === point ? 24 : 6,
-                backgroundColor:
-                  currentPoint === point
-                    ? "#C19A40"
-                    : "rgba(193, 154, 64, 0.3)",
-              }}
-              title={`Point ${point}`}
+        ) : (
+          <div className="relative w-full h-full">
+            <img
+              src={getBalconyViewImage(floorNumber, lastValidPoint)}
+              alt={`Floor ${floorNumber} - Last valid view`}
+              className="block select-none w-full h-full object-contain filter blur-sm opacity-40"
+              draggable={false}
             />
-          )
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-black/20 via-black/30 to-black/20">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl px-3 py-2 sm:px-6 sm:py-4 shadow-lg border border-gray-200 text-center max-w-xs">
+                <div className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 rounded-full bg-gray-100 flex items-center justify-center">
+                  <svg
+                    className="w-4 h-4 sm:w-6 sm:h-6 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+                    />
+                  </svg>
+                </div>
+                <h4 className="text-gray-800 font-semibold text-xs sm:text-sm mb-1">
+                  View Not Available
+                </h4>
+                <p className="text-gray-500 text-[10px] sm:text-xs">
+                  Point {currentPoint} doesn't exist for Floor {floorNumber}
+                </p>
+                <p className="text-gray-400 text-[10px] sm:text-xs mt-1 sm:mt-2">
+                  This floor only has {totalPoints} viewpoint
+                  {totalPoints > 1 ? "s" : ""}
+                </p>
+              </div>
+            </div>
+          </div>
         )}
       </div>
+
+      {/* Navigation Arrows - smaller on mobile */}
+      {isMaster && (
+        <>
+          <button
+            ref={prevButtonRef}
+            onClick={handlePrevPoint}
+            className="absolute left-1 sm:left-3 top-1/2 -translate-y-1/2 z-30 w-6 h-6 sm:w-8 sm:h-8 bg-[#FFFBF5]/80 hover:bg-[#FFFBF5] border border-[#C19A40]/30 rounded-full flex items-center justify-center cursor-pointer group"
+            title="Previous viewpoint"
+          >
+            <svg
+              className="w-3 h-3 sm:w-4 sm:h-4 text-[#C19A40] group-hover:text-[#A37F2D]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+
+          <button
+            ref={nextButtonRef}
+            onClick={handleNextPoint}
+            className="absolute right-1 sm:right-3 top-1/2 -translate-y-1/2 z-30 w-6 h-6 sm:w-8 sm:h-8 bg-[#FFFBF5]/80 hover:bg-[#FFFBF5] border border-[#C19A40]/30 rounded-full flex items-center justify-center cursor-pointer group"
+            title="Next viewpoint"
+          >
+            <svg
+              className="w-3 h-3 sm:w-4 sm:h-4 text-[#C19A40] group-hover:text-[#A37F2D]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+        </>
+      )}
     </div>
   );
 }
 
-// Plan Type Toggle Component
+// Plan Type Toggle Component - RESPONSIVE: smaller on mobile
 function PlanTypeToggle({ isUnitPlan, onToggle, borderColor = "#C19A40" }) {
   const toggleRef = useRef(null);
   const sliderRef = useRef(null);
@@ -451,7 +558,7 @@ function PlanTypeToggle({ isUnitPlan, onToggle, borderColor = "#C19A40" }) {
   useEffect(() => {
     if (sliderRef.current) {
       gsap.to(sliderRef.current, {
-        left: isUnitPlan ? "calc(100% - 22px)" : "2px",
+        left: isUnitPlan ? "calc(100% - 18px)" : "2px",
         duration: 0.3,
         ease: "power2.out",
       });
@@ -473,9 +580,9 @@ function PlanTypeToggle({ isUnitPlan, onToggle, borderColor = "#C19A40" }) {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1 sm:gap-2">
       <span
-        className={`text-xs font-medium transition-colors uppercase ${
+        className={`text-[9px] sm:text-xs font-medium transition-colors uppercase ${
           !isUnitPlan ? "text-gray-800" : "text-gray-400"
         }`}
       >
@@ -484,7 +591,7 @@ function PlanTypeToggle({ isUnitPlan, onToggle, borderColor = "#C19A40" }) {
       <button
         ref={toggleRef}
         onClick={handleToggle}
-        className="relative w-14 h-7 rounded-full cursor-pointer transition-colors"
+        className="relative w-9 h-5 sm:w-14 sm:h-7 rounded-full cursor-pointer transition-colors"
         style={{
           backgroundColor: isUnitPlan ? borderColor : "#E5E7EB",
           border: `2px solid ${isUnitPlan ? borderColor : "#D1D5DB"}`,
@@ -493,12 +600,12 @@ function PlanTypeToggle({ isUnitPlan, onToggle, borderColor = "#C19A40" }) {
       >
         <div
           ref={sliderRef}
-          className="absolute top-1/2 -translate-y-1/2 w-5 h-5 bg-white rounded-full shadow-md"
-          style={{ left: isUnitPlan ? "calc(100% - 22px)" : "2px" }}
+          className="absolute top-1/2 -translate-y-1/2 w-3 h-3 sm:w-5 sm:h-5 bg-white rounded-full shadow-md"
+          style={{ left: isUnitPlan ? "calc(100% - 18px)" : "2px" }}
         />
       </button>
       <span
-        className={`text-xs font-medium transition-colors uppercase ${
+        className={`text-[9px] sm:text-xs font-medium transition-colors uppercase ${
           isUnitPlan ? "text-gray-800" : "text-gray-400"
         }`}
       >
@@ -507,7 +614,6 @@ function PlanTypeToggle({ isUnitPlan, onToggle, borderColor = "#C19A40" }) {
     </div>
   );
 }
-
 export default function FloorComparisonPanel({
   show,
   onClose,
@@ -525,23 +631,18 @@ export default function FloorComparisonPanel({
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [activeDragFloor, setActiveDragFloor] = useState(null);
 
-  // View mode state: 'floorplan', 'unitplan', or 'balcony'
   const [firstFloorViewMode, setFirstFloorViewMode] = useState("unitplan");
   const [secondFloorViewMode, setSecondFloorViewMode] = useState("unitplan");
 
-  // Balcony carousel point state (1-4 depending on floor type)
   const [firstFloorBalconyPoint, setFirstFloorBalconyPoint] = useState(1);
   const [secondFloorBalconyPoint, setSecondFloorBalconyPoint] = useState(1);
 
-  // Selected region point for highlighting
   const [firstFloorSelectedPoint, setFirstFloorSelectedPoint] = useState(null);
   const [secondFloorSelectedPoint, setSecondFloorSelectedPoint] =
     useState(null);
 
-  // Right panel visibility state
   const [isRightPanelHidden, setIsRightPanelHidden] = useState(false);
 
-  // Plan type toggle state: false = floor plan, true = unit plan (unit plan is default)
   const [firstFloorIsUnitPlan, setFirstFloorIsUnitPlan] = useState(true);
   const [secondFloorIsUnitPlan, setSecondFloorIsUnitPlan] = useState(true);
 
@@ -549,7 +650,6 @@ export default function FloorComparisonPanel({
   const overlayRef = useRef(null);
   const svgRef = useRef(null);
 
-  // Refs for GSAP animations
   const leftPanelRef = useRef(null);
   const rightPanelRef = useRef(null);
   const toggleButtonRef = useRef(null);
@@ -558,7 +658,6 @@ export default function FloorComparisonPanel({
   const contentWrapperRef = useRef(null);
   const gridRef = useRef(null);
 
-  // Helper function to get floor type for SVG selection
   const getFloorType = (floorNumber) => {
     const floor = parseInt(floorNumber);
     if (floor === 1) return "1st";
@@ -567,37 +666,30 @@ export default function FloorComparisonPanel({
     return "multiple";
   };
 
-  // Check if we're currently in balcony view mode (either floor)
   const isInBalconyViewMode = useCallback(() => {
     return (
       firstFloorViewMode === "balcony" || secondFloorViewMode === "balcony"
     );
   }, [firstFloorViewMode, secondFloorViewMode]);
 
-  // Unit plan region click handlers - opens balcony view at specific point
   const handleFirstFloorRegionClick = (point) => {
     setFirstFloorSelectedPoint(point);
     setFirstFloorBalconyPoint(point);
     setFirstFloorViewMode("balcony");
-    // Reset zoom when switching to balcony view
     setFirstFloorZoom(1);
     setFirstFloorPan({ x: 0, y: 0 });
 
-    // Also switch second floor to balcony view if it exists
     if (secondFloor) {
       const secondFloorType = getFloorType(secondFloor.info.floorNumber);
       const secondFloorTotalPoints = getTotalBalconyPoints(secondFloorType);
-      // Use the same point if available, otherwise use point 1
       const secondPoint = point <= secondFloorTotalPoints ? point : 1;
       setSecondFloorSelectedPoint(secondPoint);
       setSecondFloorBalconyPoint(secondPoint);
       setSecondFloorViewMode("balcony");
-      // Reset zoom for second floor too
       setSecondFloorZoom(1);
       setSecondFloorPan({ x: 0, y: 0 });
     }
 
-    console.log(`Region clicked - switching to balcony view at Point ${point}`);
     if ("vibrate" in navigator) navigator.vibrate(30);
   };
 
@@ -605,62 +697,48 @@ export default function FloorComparisonPanel({
     setSecondFloorSelectedPoint(point);
     setSecondFloorBalconyPoint(point);
     setSecondFloorViewMode("balcony");
-    // Reset zoom when switching to balcony view
     setSecondFloorZoom(1);
     setSecondFloorPan({ x: 0, y: 0 });
 
-    // Also switch first floor to balcony view
     const firstFloorType = getFloorType(firstFloor.info.floorNumber);
     const firstFloorTotalPoints = getTotalBalconyPoints(firstFloorType);
-    // Use the same point if available, otherwise use point 1
     const firstPoint = point <= firstFloorTotalPoints ? point : 1;
     setFirstFloorSelectedPoint(firstPoint);
     setFirstFloorBalconyPoint(firstPoint);
     setFirstFloorViewMode("balcony");
-    // Reset zoom for first floor too
     setFirstFloorZoom(1);
     setFirstFloorPan({ x: 0, y: 0 });
 
-    console.log(`Region clicked - switching to balcony view at Point ${point}`);
     if ("vibrate" in navigator) navigator.vibrate(30);
   };
 
-  // Thumbnail click handlers - swap back to unit plan view for ALL floors
   const handleUnitPlanThumbnailClick = () => {
     setFirstFloorSelectedPoint(null);
     setFirstFloorViewMode("unitplan");
     setFirstFloorIsUnitPlan(true);
-    // Reset zoom when switching back to unit plan
     setFirstFloorZoom(1);
     setFirstFloorPan({ x: 0, y: 0 });
 
-    // Also switch second floor back to unit plan view if it exists
     if (secondFloor) {
       setSecondFloorSelectedPoint(null);
       setSecondFloorViewMode("unitplan");
       setSecondFloorIsUnitPlan(true);
-      // Reset zoom for second floor too
       setSecondFloorZoom(1);
       setSecondFloorPan({ x: 0, y: 0 });
     }
 
-    console.log("Thumbnail clicked - switching all floors back to unit plan");
     if ("vibrate" in navigator) navigator.vibrate(30);
   };
 
-  // Plan type toggle handlers - sync both floors
   const handleFirstFloorPlanToggle = () => {
     const newValue = !firstFloorIsUnitPlan;
     setFirstFloorIsUnitPlan(newValue);
     setFirstFloorViewMode(newValue ? "unitplan" : "floorplan");
-    // Reset zoom when switching between floor/unit plan
     setFirstFloorZoom(1);
     setFirstFloorPan({ x: 0, y: 0 });
-    // Sync second floor if it exists
     if (secondFloor) {
       setSecondFloorIsUnitPlan(newValue);
       setSecondFloorViewMode(newValue ? "unitplan" : "floorplan");
-      // Reset zoom for second floor too
       setSecondFloorZoom(1);
       setSecondFloorPan({ x: 0, y: 0 });
     }
@@ -670,25 +748,20 @@ export default function FloorComparisonPanel({
     const newValue = !secondFloorIsUnitPlan;
     setSecondFloorIsUnitPlan(newValue);
     setSecondFloorViewMode(newValue ? "unitplan" : "floorplan");
-    // Reset zoom when switching between floor/unit plan
     setSecondFloorZoom(1);
     setSecondFloorPan({ x: 0, y: 0 });
-    // Sync first floor
     setFirstFloorIsUnitPlan(newValue);
     setFirstFloorViewMode(newValue ? "unitplan" : "floorplan");
-    // Reset zoom for first floor too
     setFirstFloorZoom(1);
     setFirstFloorPan({ x: 0, y: 0 });
   };
 
-  // Calculate pan limits based on zoom level
   const getPanLimits = (zoom) => {
     const maxPanPercent = (zoom - 1) / zoom;
     const maxPan = maxPanPercent * 2800;
     return maxPan;
   };
 
-  // Clamp pan values to limits
   const clampPan = (pan, zoom) => {
     const limit = getPanLimits(zoom);
     return {
@@ -697,7 +770,6 @@ export default function FloorComparisonPanel({
     };
   };
 
-  // Zoom controls - smaller increment (10%)
   const zoomIn = (setZoom) => {
     setZoom((prev) => Math.min(prev + 0.1, 5));
   };
@@ -721,11 +793,9 @@ export default function FloorComparisonPanel({
     setPan({ x: 0, y: 0 });
   };
 
-  // Drag/Pan handlers
   const handleMouseDown = (e, floorType) => {
     if (floorType === "first") {
       if (firstFloorZoom > 1) {
-        // Enable dragging when zoomed in
         setIsDragging(true);
         setActiveDragFloor(floorType);
         setDragStart({ x: e.clientX, y: e.clientY });
@@ -733,7 +803,6 @@ export default function FloorComparisonPanel({
       }
     } else if (floorType === "second") {
       if (secondFloorZoom > 1) {
-        // Enable dragging when zoomed in
         setIsDragging(true);
         setActiveDragFloor(floorType);
         setDragStart({ x: e.clientX, y: e.clientY });
@@ -742,9 +811,7 @@ export default function FloorComparisonPanel({
     }
   };
 
-  // Click to zoom handler
   const handleImageClick = (e, floorType) => {
-    // Only zoom in on click if not dragging and at base zoom or below
     if (!isDragging) {
       if (floorType === "first" && firstFloorZoom <= 1) {
         setFirstFloorZoom((prev) => Math.min(prev + 0.3, 5));
@@ -754,7 +821,6 @@ export default function FloorComparisonPanel({
     }
   };
 
-  // Mouse wheel zoom handler
   const handleWheel = (e, floorType) => {
     e.preventDefault();
     const zoomDelta = e.deltaY > 0 ? -0.1 : 0.1;
@@ -807,7 +873,6 @@ export default function FloorComparisonPanel({
     setActiveDragFloor(null);
   }, []);
 
-  // Add global mouse event listeners for dragging
   useEffect(() => {
     if (isDragging) {
       window.addEventListener("mousemove", handleMouseMove);
@@ -819,7 +884,6 @@ export default function FloorComparisonPanel({
     }
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
-  // Helper function to extract floor number from various data structures
   const extractFloorNumber = (floorData) => {
     if (!floorData) return null;
     return (
@@ -831,7 +895,6 @@ export default function FloorComparisonPanel({
     );
   };
 
-  // Get floor plan image based on floor number and plan type
   const getFloorPlanImage = useCallback((floorNumber, isUnitPlan = false) => {
     const floor = parseInt(floorNumber);
     const suffix = isUnitPlan ? "_unit" : "";
@@ -859,7 +922,6 @@ export default function FloorComparisonPanel({
     return `/floors-images/multiple${suffix}.png`;
   }, []);
 
-  // Helper to check if two floors have different images (can be compared)
   const canCompareFloors = useCallback(
     (floorNumber1, floorNumber2) => {
       if (!floorNumber1 || !floorNumber2) return true;
@@ -870,12 +932,9 @@ export default function FloorComparisonPanel({
     [getFloorPlanImage]
   );
 
-  // Check if a floor is selectable (has different image than first floor, or in balcony mode where all floors are selectable)
   const isFloorSelectable = useCallback(
     (floor) => {
       if (!firstFloor) return true;
-
-      // In balcony view mode, all floors are selectable since each floor has unique balcony views
       if (isInBalconyViewMode()) return true;
 
       const firstFloorNumber = extractFloorNumber(firstFloor);
@@ -885,7 +944,6 @@ export default function FloorComparisonPanel({
     [firstFloor, canCompareFloors, isInBalconyViewMode]
   );
 
-  // Initialize first floor from lockedFloor prop
   useEffect(() => {
     if (show && lockedFloor) {
       const floorNum = extractFloorNumber(lockedFloor);
@@ -903,14 +961,12 @@ export default function FloorComparisonPanel({
       setSecondFloorZoom(1);
       setFirstFloorPan({ x: 0, y: 0 });
       setSecondFloorPan({ x: 0, y: 0 });
-      // Reset view modes to unit plan (default)
       setFirstFloorViewMode("unitplan");
       setSecondFloorViewMode("unitplan");
       setFirstFloorBalconyPoint(1);
       setSecondFloorBalconyPoint(1);
       setFirstFloorSelectedPoint(null);
       setSecondFloorSelectedPoint(null);
-      // Reset plan type toggles to default (unit plan)
       setFirstFloorIsUnitPlan(true);
       setSecondFloorIsUnitPlan(true);
     } else if (show && !lockedFloor) {
@@ -931,7 +987,6 @@ export default function FloorComparisonPanel({
     }
   }, [show, lockedFloor]);
 
-  // Entrance animation
   useEffect(() => {
     if (show && panelRef.current && overlayRef.current) {
       gsap.set(overlayRef.current, { opacity: 0 });
@@ -954,7 +1009,6 @@ export default function FloorComparisonPanel({
     }
   }, [show]);
 
-  // GSAP animation for toggling right panel
   useEffect(() => {
     if (
       !leftPanelRef.current ||
@@ -968,127 +1022,41 @@ export default function FloorComparisonPanel({
     });
 
     if (isRightPanelHidden) {
-      // Hide right panel - expand left panel
-      tl.to(
-        leftPanelRef.current,
-        {
-          width: "100%",
-          duration: 0.5,
-        },
-        0
-      )
+      tl.to(leftPanelRef.current, { width: "100%", duration: 0.5 }, 0)
         .to(
           rightPanelRef.current,
-          {
-            width: "0%",
-            opacity: 0,
-            padding: 0,
-            duration: 0.5,
-          },
+          { width: "0%", opacity: 0, padding: 0, duration: 0.5 },
           0
         )
-        .to(
-          toggleButtonRef.current,
-          {
-            right: "8px",
-            duration: 0.5,
-          },
-          0
-        )
+        .to(toggleButtonRef.current, { right: "8px", duration: 0.5 }, 0)
         .to(
           toggleArrowRef.current,
-          {
-            rotation: 180,
-            duration: 0.4,
-            ease: "back.out(1.7)",
-          },
+          { rotation: 180, duration: 0.4, ease: "back.out(1.7)" },
           0.1
         )
-        .to(
-          contentWrapperRef.current,
-          {
-            padding: "16px",
-            duration: 0.4,
-          },
-          0
-        )
-        .to(
-          headerRef.current,
-          {
-            fontSize: "1.5rem",
-            duration: 0.4,
-          },
-          0
-        )
-        .to(
-          gridRef.current,
-          {
-            gap: "16px",
-            duration: 0.4,
-          },
-          0
-        );
+        .to(contentWrapperRef.current, { padding: "16px", duration: 0.4 }, 0)
+        .to(headerRef.current, { fontSize: "1.5rem", duration: 0.4 }, 0)
+        .to(gridRef.current, { gap: "16px", duration: 0.4 }, 0);
     } else {
-      // Show right panel - shrink left panel
-      tl.to(
-        leftPanelRef.current,
-        {
-          width: "66.666%",
-          duration: 0.5,
-        },
-        0
-      )
+      tl.to(leftPanelRef.current, { width: "66.666%", duration: 0.5 }, 0)
         .to(
           rightPanelRef.current,
-          {
-            width: "33.333%",
-            opacity: 1,
-            padding: "24px",
-            duration: 0.5,
-          },
+          { width: "33.333%", opacity: 1, padding: "24px", duration: 0.5 },
           0
         )
         .to(
           toggleButtonRef.current,
-          {
-            right: "calc(33.333% - 12px)",
-            duration: 0.5,
-          },
+          { right: "calc(33.333% - 12px)", duration: 0.5 },
           0
         )
         .to(
           toggleArrowRef.current,
-          {
-            rotation: 0,
-            duration: 0.4,
-            ease: "back.out(1.7)",
-          },
+          { rotation: 0, duration: 0.4, ease: "back.out(1.7)" },
           0.1
         )
-        .to(
-          contentWrapperRef.current,
-          {
-            padding: "24px",
-            duration: 0.4,
-          },
-          0
-        )
-        .to(
-          headerRef.current,
-          {
-            fontSize: "1.875rem",
-            duration: 0.4,
-          },
-          0
-        )
-        .to(
-          gridRef.current,
-          {
-            gap: "24px",
-            duration: 0.4,
-          },
-          0
-        );
+        .to(contentWrapperRef.current, { padding: "24px", duration: 0.4 }, 0)
+        .to(headerRef.current, { fontSize: "1.875rem", duration: 0.4 }, 0)
+        .to(gridRef.current, { gap: "24px", duration: 0.4 }, 0);
     }
   }, [isRightPanelHidden]);
 
@@ -1131,11 +1099,9 @@ export default function FloorComparisonPanel({
         },
       };
 
-      // Check if we're currently in balcony view mode
       const currentlyInBalconyMode = isInBalconyViewMode();
 
       if (secondFloor && secondFloor.id === floor.path_id) {
-        // Deselecting the second floor
         setSecondFloor(null);
         setSecondFloorZoom(1);
         setSecondFloorPan({ x: 0, y: 0 });
@@ -1144,19 +1110,15 @@ export default function FloorComparisonPanel({
         setSecondFloorSelectedPoint(null);
         setSecondFloorIsUnitPlan(true);
       } else {
-        // Selecting a new second floor - reset zoom for both floors
         setSecondFloor(floorData);
         setSecondFloorZoom(1);
         setSecondFloorPan({ x: 0, y: 0 });
-        // Also reset first floor zoom when comparing
         setFirstFloorZoom(1);
         setFirstFloorPan({ x: 0, y: 0 });
 
-        // If currently in balcony view mode, keep the new floor in balcony view
         if (currentlyInBalconyMode) {
           const newFloorType = getFloorType(floorNum);
           const newFloorTotalPoints = getTotalBalconyPoints(newFloorType);
-          // Use the same point if available, otherwise use point 1
           const newPoint =
             firstFloorBalconyPoint <= newFloorTotalPoints
               ? firstFloorBalconyPoint
@@ -1169,7 +1131,6 @@ export default function FloorComparisonPanel({
           setSecondFloorBalconyPoint(1);
           setSecondFloorSelectedPoint(null);
         }
-        // Sync plan type with first floor
         setSecondFloorIsUnitPlan(firstFloorIsUnitPlan);
       }
 
@@ -1193,32 +1154,19 @@ export default function FloorComparisonPanel({
       const selectable = isFloorSelectable(floor);
       const inBalconyMode = isInBalconyViewMode();
 
-      if (isFirstFloor) {
-        return "rgba(193, 154, 64, 0.8)";
-      }
-
-      if (isSecondFloor) {
-        return "rgba(29, 41, 56, 0.8)";
-      }
-
-      if (firstFloor && !selectable) {
-        return "rgba(0, 0, 0, 0.05)";
-      }
-
+      if (isFirstFloor) return "rgba(193, 154, 64, 0.8)";
+      if (isSecondFloor) return "rgba(29, 41, 56, 0.8)";
+      if (firstFloor && !selectable) return "rgba(0, 0, 0, 0.05)";
       if (isHovered && selectable) {
-        // Use a different hover color in balcony mode to indicate balcony selection
         return inBalconyMode
           ? "rgba(76, 175, 80, 0.7)"
           : "rgba(59, 130, 246, 0.7)";
       }
-
       if (firstFloor && selectable) {
-        // Use a different highlight color in balcony mode
         return inBalconyMode
           ? "rgba(76, 175, 80, 0.3)"
           : "rgba(59, 130, 246, 0.3)";
       }
-
       return getClassColor(floor);
     },
     [
@@ -1238,23 +1186,10 @@ export default function FloorComparisonPanel({
       const isFirstFloor = firstFloor && firstFloor.id === floor.path_id;
       const selectable = isFloorSelectable(floor);
 
-      if (isFirstFloor || isSecondFloor) {
-        return 1;
-      }
-
-      if (isHovered && selectable) {
-        return 1;
-      }
-
-      if (firstFloor && !selectable) {
-        return 0.3;
-      }
-
-      // In balcony mode, all selectable floors should be more visible
-      if (isInBalconyViewMode() && selectable) {
-        return 0.9;
-      }
-
+      if (isFirstFloor || isSecondFloor) return 1;
+      if (isHovered && selectable) return 1;
+      if (firstFloor && !selectable) return 0.3;
+      if (isInBalconyViewMode() && selectable) return 0.9;
       return 0.85;
     },
     [
@@ -1266,24 +1201,16 @@ export default function FloorComparisonPanel({
     ]
   );
 
-  // Exit animation
   const handleClose = () => {
     if (panelRef.current && overlayRef.current) {
-      const tl = gsap.timeline({
-        onComplete: onClose,
-      });
-
+      const tl = gsap.timeline({ onComplete: onClose });
       tl.to(panelRef.current, {
         x: "100%",
         duration: 0.4,
         ease: "power3.in",
       }).to(
         overlayRef.current,
-        {
-          opacity: 0,
-          duration: 0.25,
-          ease: "power2.in",
-        },
+        { opacity: 0, duration: 0.25, ease: "power2.in" },
         "-=0.2"
       );
     } else {
@@ -1297,7 +1224,6 @@ export default function FloorComparisonPanel({
   const hasSecondFloor = !!secondFloor;
   const hasBothFloors = hasFirstFloor && hasSecondFloor;
 
-  // Get floor types and total points for each floor
   const firstFloorType = hasFirstFloor
     ? getFloorType(firstFloor.info.floorNumber)
     : "multiple";
@@ -1306,7 +1232,6 @@ export default function FloorComparisonPanel({
     : "multiple";
   const firstFloorTotalPoints = getTotalBalconyPoints(firstFloorType);
   const secondFloorTotalPoints = getTotalBalconyPoints(secondFloorType);
-
   return createPortal(
     <div
       ref={overlayRef}
@@ -1316,15 +1241,15 @@ export default function FloorComparisonPanel({
         ref={panelRef}
         className="bg-[#FFFBF5] w-full h-full overflow-hidden flex"
       >
-        {/* Close Button */}
+        {/* Close Button - RESPONSIVE */}
         <button
           onClick={handleClose}
-          className={`absolute top-4 z-20 w-10 h-10 flex items-center justify-center bg-[#C7BED6] hover:bg-[#B0A5C5] rounded-full transition-all duration-500 cursor-pointer ${
-            isRightPanelHidden ? "right-4" : "right-4"
+          className={`absolute top-2 sm:top-4 z-20 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center bg-[#C7BED6] hover:bg-[#B0A5C5] rounded-full transition-all duration-500 cursor-pointer ${
+            isRightPanelHidden ? "right-2 sm:right-4" : "right-2 sm:right-4"
           }`}
         >
           <svg
-            className="w-6 h-6 text-white"
+            className="w-4 h-4 sm:w-6 sm:h-6 text-white"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -1346,20 +1271,27 @@ export default function FloorComparisonPanel({
         >
           <div
             ref={contentWrapperRef}
-            className="h-full flex flex-col"
+            className="h-full flex flex-col p-2 sm:p-4 md:p-6"
             style={{ padding: "24px" }}
           >
-            <div className="flex items-center justify-between mb-4 flex-shrink-0">
-              <div className="flex items-center gap-6">
+            {/* Header - RESPONSIVE */}
+            <div className="flex items-center justify-between mb-2 sm:mb-4 flex-shrink-0">
+              <div className="flex items-center gap-2 sm:gap-4 md:gap-6">
                 <h3
                   ref={headerRef}
-                  className="font-bold text-[#000000]"
+                  className="font-bold text-[#000000] text-sm sm:text-xl md:text-3xl"
                   style={{ fontSize: "1.875rem" }}
                 >
                   {hasBothFloors ? (
                     <>
-                      Comparing Floor {firstFloor?.info.floorNumber} to{" "}
-                      {secondFloor?.info.floorNumber}
+                      <span className="hidden sm:inline">
+                        Comparing Floor {firstFloor?.info.floorNumber} to{" "}
+                        {secondFloor?.info.floorNumber}
+                      </span>
+                      <span className="sm:hidden">
+                        Floor {firstFloor?.info.floorNumber} vs{" "}
+                        {secondFloor?.info.floorNumber}
+                      </span>
                     </>
                   ) : hasFirstFloor ? (
                     <>Floor {firstFloor?.info.floorNumber}</>
@@ -1367,7 +1299,6 @@ export default function FloorComparisonPanel({
                     <>Floor Plan Comparison</>
                   )}
                 </h3>
-                {/* Plan Type Toggle - in header, only show when not in balcony view */}
                 {hasFirstFloor && firstFloorViewMode !== "balcony" && (
                   <PlanTypeToggle
                     isUnitPlan={firstFloorIsUnitPlan}
@@ -1376,10 +1307,9 @@ export default function FloorComparisonPanel({
                   />
                 )}
               </div>
-              {/* Balcony view indicator */}
               {(firstFloorViewMode === "balcony" ||
                 secondFloorViewMode === "balcony") && (
-                <p className="text-sm text-green-600 normal-case">
+                <p className="text-[10px] sm:text-sm text-green-600 normal-case hidden sm:block">
                   {firstFloorViewMode === "balcony" &&
                   secondFloorViewMode === "balcony"
                     ? "Viewing balconies for both floors"
@@ -1399,7 +1329,7 @@ export default function FloorComparisonPanel({
                   ref={gridRef}
                   className={`grid h-full ${
                     hasBothFloors ? "grid-cols-2" : "grid-cols-1"
-                  }`}
+                  } gap-2 sm:gap-4 md:gap-6`}
                   style={{ gap: "24px" }}
                 >
                   {/* First Floor */}
@@ -1407,16 +1337,16 @@ export default function FloorComparisonPanel({
                     className="bg-white rounded-lg shadow-sm relative overflow-hidden flex flex-col border-2"
                     style={{ borderColor: "#C19A40" }}
                   >
-                    {/* Zoom Controls - Hide in balcony view */}
+                    {/* Zoom Controls - RESPONSIVE: bottom-right on mobile, top-right on desktop */}
                     {firstFloorViewMode !== "balcony" && (
-                      <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                      <div className="absolute bottom-2 right-2 sm:top-3 sm:right-3 sm:bottom-auto z-20 flex flex-row sm:flex-col gap-1 sm:gap-2">
                         <button
                           onClick={() => zoomIn(setFirstFloorZoom)}
-                          className="w-8 h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
+                          className="w-6 h-6 sm:w-8 sm:h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
                           title="Zoom In"
                         >
                           <svg
-                            className="w-5 h-5"
+                            className="w-3.5 h-3.5 sm:w-5 sm:h-5"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -1438,11 +1368,11 @@ export default function FloorComparisonPanel({
                               firstFloorPan
                             )
                           }
-                          className="w-8 h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
+                          className="w-6 h-6 sm:w-8 sm:h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
                           title="Zoom Out"
                         >
                           <svg
-                            className="w-5 h-5"
+                            className="w-3.5 h-3.5 sm:w-5 sm:h-5"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -1459,11 +1389,11 @@ export default function FloorComparisonPanel({
                           onClick={() =>
                             resetZoom(setFirstFloorZoom, setFirstFloorPan)
                           }
-                          className="w-8 h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
+                          className="w-6 h-6 sm:w-8 sm:h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
                           title="Reset Zoom"
                         >
                           <svg
-                            className="w-5 h-5"
+                            className="w-3.5 h-3.5 sm:w-5 sm:h-5"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -1478,24 +1408,22 @@ export default function FloorComparisonPanel({
                         </button>
                       </div>
                     )}
-                    {/* Zoom indicator - Hide in balcony view */}
+                    {/* Zoom indicator - RESPONSIVE */}
                     {firstFloorViewMode !== "balcony" && (
-                      <div className="absolute bottom-3 left-3 z-20 bg-white/80 px-2 py-1 rounded text-xs text-gray-600">
+                      <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 z-20 bg-white/80 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded text-[10px] sm:text-xs text-gray-600">
                         {Math.round(firstFloorZoom * 100)}%
                       </div>
                     )}
-                    {/* View mode indicator */}
-                    <div className="absolute top-3 left-3 z-20 bg-[#C19A40] text-white px-2 py-1 rounded text-xs">
+                    {/* View mode indicator - RESPONSIVE */}
+                    <div className="absolute top-1.5 left-1.5 sm:top-3 sm:left-3 z-20 bg-[#C19A40] text-white px-1.5 py-0.5 sm:px-2 sm:py-1 rounded text-[9px] sm:text-xs hidden lg:block">
                       {firstFloorViewMode === "balcony"
-                        ? `Balcony View - Point ${firstFloorBalconyPoint}`
+                        ? `Balcony - Pt ${firstFloorBalconyPoint}`
                         : firstFloorIsUnitPlan
                         ? "Unit Plan"
                         : "Floor Plan"}
                     </div>
 
-                    {/* Main Content Area */}
                     <div className="relative bg-white flex-1 min-h-0 flex flex-col">
-                      {/* Main View Area */}
                       <div
                         className="relative flex-1 min-h-0 overflow-hidden"
                         onMouseDown={(e) =>
@@ -1522,10 +1450,9 @@ export default function FloorComparisonPanel({
                         }}
                       >
                         <div
-                          className="w-full h-full flex items-center justify-center p-2"
+                          className="w-full h-full flex items-center justify-center p-1 sm:p-2"
                           style={{ minHeight: "100%" }}
                         >
-                          {/* Show Floor Plan, Unit Plan, or Balcony Carousel based on view mode */}
                           {firstFloorViewMode === "balcony" ? (
                             <BalconyViewCarousel
                               floorNumber={firstFloor.info.floorNumber}
@@ -1533,8 +1460,15 @@ export default function FloorComparisonPanel({
                               onPointChange={(point) => {
                                 setFirstFloorBalconyPoint(point);
                                 setFirstFloorSelectedPoint(point);
+                                if (secondFloor) {
+                                  setSecondFloorBalconyPoint(point);
+                                  setSecondFloorSelectedPoint(point);
+                                }
                               }}
                               totalPoints={firstFloorTotalPoints}
+                              accentColor="#C19A40"
+                              isMaster={true}
+                              masterTotalPoints={firstFloorTotalPoints}
                             />
                           ) : (
                             <div
@@ -1566,7 +1500,6 @@ export default function FloorComparisonPanel({
                                 }}
                                 draggable={false}
                               />
-                              {/* Unit Plan Overlay - only show on unit plan view */}
                               {firstFloorIsUnitPlan && (
                                 <UnitPlanOverlay
                                   floorType={firstFloorType}
@@ -1587,16 +1520,15 @@ export default function FloorComparisonPanel({
                       className="bg-white rounded-lg shadow-sm relative overflow-hidden flex flex-col border-2"
                       style={{ borderColor: "#BDD1B1" }}
                     >
-                      {/* Zoom Controls - Hide in balcony view */}
                       {secondFloorViewMode !== "balcony" && (
-                        <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                        <div className="absolute bottom-2 right-2 sm:top-3 sm:right-3 sm:bottom-auto z-20 flex flex-row sm:flex-col gap-1 sm:gap-2">
                           <button
                             onClick={() => zoomIn(setSecondFloorZoom)}
-                            className="w-8 h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
+                            className="w-6 h-6 sm:w-8 sm:h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
                             title="Zoom In"
                           >
                             <svg
-                              className="w-5 h-5"
+                              className="w-3.5 h-3.5 sm:w-5 sm:h-5"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -1618,11 +1550,11 @@ export default function FloorComparisonPanel({
                                 secondFloorPan
                               )
                             }
-                            className="w-8 h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
+                            className="w-6 h-6 sm:w-8 sm:h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
                             title="Zoom Out"
                           >
                             <svg
-                              className="w-5 h-5"
+                              className="w-3.5 h-3.5 sm:w-5 sm:h-5"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -1639,11 +1571,11 @@ export default function FloorComparisonPanel({
                             onClick={() =>
                               resetZoom(setSecondFloorZoom, setSecondFloorPan)
                             }
-                            className="w-8 h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
+                            className="w-6 h-6 sm:w-8 sm:h-8 bg-white hover:bg-gray-100 rounded-full shadow-md cursor-pointer flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
                             title="Reset Zoom"
                           >
                             <svg
-                              className="w-5 h-5"
+                              className="w-3.5 h-3.5 sm:w-5 sm:h-5"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -1658,24 +1590,20 @@ export default function FloorComparisonPanel({
                           </button>
                         </div>
                       )}
-                      {/* Zoom indicator - Hide in balcony view */}
                       {secondFloorViewMode !== "balcony" && (
-                        <div className="absolute bottom-3 left-3 z-20 bg-white/80 px-2 py-1 rounded text-xs text-gray-600">
+                        <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 z-20 bg-white/80 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded text-[10px] sm:text-xs text-gray-600">
                           {Math.round(secondFloorZoom * 100)}%
                         </div>
                       )}
-                      {/* View mode indicator */}
-                      <div className="absolute top-3 left-3 z-20 bg-[#BDD1B1] text-gray-800 px-2 py-1 rounded text-xs">
+                      <div className="absolute top-1.5 left-1.5 sm:top-3 sm:left-3 z-20 bg-[#BDD1B1] text-gray-800 px-1.5 py-0.5 hidden sm:px-2 sm:py-1 rounded text-[9px] sm:text-xs lg:block ">
                         {secondFloorViewMode === "balcony"
-                          ? `Balcony View - Point ${secondFloorBalconyPoint}`
+                          ? `Balcony - Pt ${secondFloorBalconyPoint}`
                           : secondFloorIsUnitPlan
                           ? "Unit Plan"
                           : "Floor Plan"}
                       </div>
 
-                      {/* Main Content Area */}
                       <div className="relative bg-white flex-1 min-h-0 flex flex-col">
-                        {/* Main View Area */}
                         <div
                           className="relative flex-1 min-h-0 overflow-hidden"
                           onMouseDown={(e) =>
@@ -1702,19 +1630,18 @@ export default function FloorComparisonPanel({
                           }}
                         >
                           <div
-                            className="w-full h-full flex items-center justify-center p-2"
+                            className="w-full h-full flex items-center justify-center p-1 sm:p-2"
                             style={{ minHeight: "100%" }}
                           >
-                            {/* Show Floor Plan, Unit Plan, or Balcony Carousel based on view mode */}
                             {secondFloorViewMode === "balcony" ? (
                               <BalconyViewCarousel
                                 floorNumber={secondFloor.info.floorNumber}
-                                currentPoint={secondFloorBalconyPoint}
-                                onPointChange={(point) => {
-                                  setSecondFloorBalconyPoint(point);
-                                  setSecondFloorSelectedPoint(point);
-                                }}
+                                currentPoint={firstFloorBalconyPoint}
+                                onPointChange={() => {}}
                                 totalPoints={secondFloorTotalPoints}
+                                accentColor="#BDD1B1"
+                                isMaster={false}
+                                masterTotalPoints={firstFloorTotalPoints}
                               />
                             ) : (
                               <div
@@ -1748,7 +1675,6 @@ export default function FloorComparisonPanel({
                                   }}
                                   draggable={false}
                                 />
-                                {/* Unit Plan Overlay - only show on unit plan view */}
                                 {secondFloorIsUnitPlan && (
                                   <UnitPlanOverlay
                                     floorType={secondFloorType}
@@ -1766,13 +1692,13 @@ export default function FloorComparisonPanel({
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-center bg-[#E8F4FE] rounded-lg border-2 border-[#C4E0FD]">
-                  <div className="bg-white p-8 rounded-lg shadow-sm">
-                    <h4 className="text-xl font-semibold text-[#000000] mb-2">
+                  <div className="bg-white p-4 sm:p-8 rounded-lg shadow-sm">
+                    <h4 className="text-base sm:text-xl font-semibold text-[#000000] mb-2">
                       {firstFloor
                         ? "Select a Floor to Compare"
                         : "Select Floors from Building"}
                     </h4>
-                    <p className="text-[#3F3F41] max-w-md">
+                    <p className="text-xs sm:text-base text-[#3F3F41] max-w-md">
                       {firstFloor
                         ? "Click on a highlighted floor in the building view to compare different floor plans."
                         : "Use the building visualization to select floors for comparison."}
@@ -1784,11 +1710,11 @@ export default function FloorComparisonPanel({
           </div>
         </div>
 
-        {/* Toggle Button for Right Panel */}
+        {/* Toggle Button for Right Panel - RESPONSIVE */}
         <button
           ref={toggleButtonRef}
           onClick={() => setIsRightPanelHidden(!isRightPanelHidden)}
-          className="absolute top-1/2 -translate-y-1/2 z-30 w-6 h-16 bg-[#FFFBF5] hover:bg-[#F5EFE6] border border-[#C19A40]/30 rounded-lg flex items-center justify-center cursor-pointer group shadow-md"
+          className="absolute top-1/2 -translate-y-1/2 z-30 w-5 h-12 sm:w-6 sm:h-16 bg-[#FFFBF5] hover:bg-[#F5EFE6] border border-[#C19A40]/30 rounded-lg flex items-center justify-center cursor-pointer group shadow-md"
           style={{ right: "calc(33.333% - 12px)" }}
           title={
             isRightPanelHidden ? "Show building view" : "Hide building view"
@@ -1796,7 +1722,7 @@ export default function FloorComparisonPanel({
         >
           <svg
             ref={toggleArrowRef}
-            className="w-4 h-4 text-[#C19A40] group-hover:text-[#A37F2D]"
+            className="w-3 h-3 sm:w-4 sm:h-4 text-[#C19A40] group-hover:text-[#A37F2D]"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -1813,10 +1739,9 @@ export default function FloorComparisonPanel({
         {/* Right Panel - Building SVG */}
         <div
           ref={rightPanelRef}
-          className="flex flex-col right-panel overflow-hidden"
+          className="flex flex-col right-panel overflow-hidden p-2 sm:p-4 md:p-6"
           style={{ width: "33.333%", padding: "24px", opacity: 1 }}
         >
-          {/* Building SVG - Takes up top portion */}
           <div className="h-3/5 flex items-stretch justify-stretch w-full">
             <div className="relative w-full h-full overflow-hidden">
               <svg
@@ -1839,7 +1764,6 @@ export default function FloorComparisonPanel({
                   height="3840"
                   preserveAspectRatio="xMidYMid slice"
                 />
-
                 <g
                   style={{ transform: "translate(2050px, -10px) scale(0.85)" }}
                 >
@@ -1895,58 +1819,47 @@ export default function FloorComparisonPanel({
             </div>
           </div>
 
-          {/* Unit Plan Thumbnail - Shows when in balcony view mode, replaces sunset image */}
-          <div className="h-2/5 mt-4 rounded-lg overflow-hidden shadow-md bg-white border-2 border-[#C19A40]/30 flex items-center justify-center">
+          {/* Unit Plan Thumbnail - RESPONSIVE label */}
+          <div className="h-2/5 mt-2 sm:mt-4 rounded-lg overflow-hidden shadow-md bg-white border-2 border-[#C19A40]/30 flex items-center justify-center">
             {(firstFloorViewMode === "balcony" ||
               secondFloorViewMode === "balcony") &&
             hasFirstFloor ? (
               <div
-                className="relative w-full h-full cursor-pointer group"
+                className="relative w-full h-full cursor-pointer group flex items-center justify-center p-2 sm:p-4"
                 onClick={handleUnitPlanThumbnailClick}
               >
-                <img
-                  src={getFloorPlanImage(firstFloor.info.floorNumber, true)}
-                  alt="Unit Plan"
-                  className="w-full h-full object-contain p-4"
-                />
-
-                 {(() => {
-        const radarConfig = getRadarPositionConfig(firstFloorType);
-        return (
-          <div
-            className="absolute pointer-events-none"
-            style={{
-              top: radarConfig.top,
-              left: radarConfig.left,
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
-            <RadarViewIndicator
-              currentPoint={firstFloorBalconyPoint}
-              floorType={firstFloorType}
-              size={radarConfig.size}
-              className="drop-shadow-lg"
-            />
-          </div>
-        );
-      })()}
-
-
+                {/* Aspect-ratio locked wrapper - keeps radar position consistent */}
+                <div
+                  className="relative max-w-full max-h-full"
+                  style={{ aspectRatio: "4 / 3" }}
+                >
+                  <img
+                    src={getFloorPlanImage(firstFloor.info.floorNumber, true)}
+                    alt="Unit Plan"
+                    className="w-full h-full object-contain"
+                  />
+                  {/* Radar now positioned relative to this aspect-ratio locked container */}
+                  <RadarViewIndicator
+                    currentPoint={firstFloorBalconyPoint}
+                    floorType={firstFloorType}
+                    className="drop-shadow-lg"
+                  />
+                </div>
                 {/* Hover overlay */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                  <span className="text-white text-sm font-medium bg-black/50 px-3 py-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center pointer-events-none">
+                  <span className="text-white text-[10px] sm:text-sm font-medium bg-black/50 px-2 py-1 sm:px-3 sm:py-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">
                     Click to view Unit Plan
                   </span>
                 </div>
                 {/* Label */}
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-[#C19A40] text-white px-3 py-1 rounded text-xs">
+                <div className="absolute bottom-1 sm:bottom-2 left-1/2 -translate-x-1/2 bg-[#C19A40] text-white px-1.5 py-0.5 sm:px-3 sm:py-1 rounded text-[8px] sm:text-xs whitespace-nowrap">
                   Unit Plan - Floor {firstFloor.info.floorNumber}
                 </div>
               </div>
             ) : (
-              <div className="text-center text-gray-400 p-4">
+              <div className="text-center text-gray-400 p-2 sm:p-4">
                 <svg
-                  className="w-12 h-12 mx-auto mb-2 opacity-50"
+                  className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-1 sm:mb-2 opacity-50"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1958,7 +1871,7 @@ export default function FloorComparisonPanel({
                     d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
                   />
                 </svg>
-                <p className="text-sm">
+                <p className="text-[10px] sm:text-sm">
                   Select a balcony viewpoint to see the unit plan here
                 </p>
               </div>
