@@ -129,6 +129,134 @@ const UNIT_PLAN_SVG_CONFIG = {
       },
     ],
   },
+  // For 18th, 19th, 20th floors - no SVG regions (balcony views coming later)
+  "18th": {
+  totalPoints: 4,
+  regions: [
+    {
+      id: "18th_1st",
+      point: 1,
+      viewBox: "0 0 121.71675 38.157799",
+      transform: "translate(-161.16494,14.649136)",
+      path: "m 274.79013,23.508662 -105.26656,-0.261208 -0.0653,-18.2192124 -8.29333,0.065302 0.0333,-2.0806005 0.10389,-0.9581388 0.1039,-0.6349114 0.11543,-0.53101677 0.0346,-0.35785914 0.0808,-0.41557836 0.0693,-0.35785914 0.0923,-0.3232276 0.0577,-0.28859609 0.0923,-0.2885961 0.0808,-0.3001399 0.11544,-0.2308769 0.0577,-0.2539645 0.0924,-0.2655084 0.0923,-0.219333 0.1039,-0.2077892 0.10389,-0.2424207 0.0577,-0.1616139 0.0808,-0.1731576 0.10389,-0.1731576 0.0577,-0.2655083 0.0808,-0.1616139 0.35786,-0.6118238 0.28859,-0.5541044 0.4733,-0.7849812 0.35786,-0.60028 0.68109,-0.9235075 1.45452,-1.6276817 1.06203,-1.0735776 1.316,-1.0851216 1.1313,-0.681087 1.45452,-0.854244 0.92351,-0.473297 1.24674,-0.496386 1.29291,-0.404034 1.37371,-0.323228 1.62768,-0.265508 2.04326,-0.09235 83.86603,0.08081 1.24673,-0.03463 0.87733,0.08081 1.52379,0.277053 1.44298,0.277052 0.98123,0.369403 1.14285,0.438666 1.48915,0.715718 1.09667,0.60028 1.17745,0.761894 0.73882,0.565648 1.50069,1.2929105 1.29292,1.396805 0.86579,1.1082091 0.93504,1.4545241 0.60029,1.1197529 0.62335,1.2698227 0.58875,1.7084887 0.36942,1.43143659 0.24241,1.47761191 0.21934,1.916278 -0.0116,1.5699626 -8.17303,-0.011544 z",
+      // TODO: Adjust these position values based on where this region should appear on 18th.png
+      position: { top: "14.8%", left: "52.2%", width: "21.85%" },
+    },
+    {
+      id: "18th_2nd",
+      point: 2,
+      viewBox: "0 0 47.539764 51.818043",
+      transform: "translate(-120.66147,-8.8310401)",
+      path: "m 161.08331,8.8483992 -18.96128,-0.017359 -21.46056,37.2230808 0.049,14.594961 47.44178,-0.0653 0.049,-37.075119 -7.10157,-0.04898 z",
+      // TODO: Adjust these position values based on where this region should appear on 18th.png
+      position: { top: "21.2%", left: "45%", width: "8.56%" },
+    },
+    {
+      id: "18th_3rd",
+      point: 3,
+      viewBox: "0 0 13.233574 36.166428",
+      transform: "translate(-51.833337,-169.36015)",
+      path: "m 65.061099,205.52658 -13.227764,-0.005 0.01633,-36.16089 7.65308,-5.3e-4 0.0058,3.13416 5.558362,-0.0173 z",
+      // TODO: Adjust these position values based on where this region should appear on 18th.png
+      position: { top: "64%", left: "32.73%", width: "2.45%" },
+    },
+    {
+      id: "18th_4th",
+      point: 4,
+      viewBox: "0 0 12.303158 33.710907",
+      transform: "translate(-36.781262,-205.52947)",
+      path: "m 49.08442,239.24038 -12.303159,-0.007 0.01632,-33.70391 10.676851,0.0163 0.01632,3.16714 1.591731,-0.008 z",
+      // TODO: Adjust these position values based on where this region should appear on 18th.png
+      position: { top: "73.8%", left: "30%", width: "2.24%" },
+    },
+  ],
+},
+  // 19th floor config - copy this into your UNIT_PLAN_SVG_CONFIG
+
+"19th": {
+  totalPoints: 4,
+  regions: [
+    {
+      id: "19th_1st",
+      point: 1,
+      viewBox: "0 0 121.71392 45.944496",
+      transform: "translate(-108.40104,-1.985541)",
+      path: "m 228.67199,47.930038 -117.2335,-0.01154 v -7.855815 h 5.19059 V 21.745512 h -8.22803 l 0.088,-2.236417 0.23087,-1.962453 0.48485,-2.054804 0.83115,-2.239506 0.99277,-1.847015 0.9466,-1.4545242 1.15438,-1.5468751 2.28568,-2.1471548 2.35495,-1.6392255 2.60891,-1.3390859 1.98554,-0.6233676 1.80084,-0.4155783 3.16301,-0.2539646 h 84.10844 l 2.53965,0.1847015 1.47761,0.3232276 1.29291,0.369403 1.98554,0.6926305 1.52379,0.7849814 1.80084,1.1082089 1.61614,1.2929105 1.98553,2.0317164 1.8932,2.7243472 0.71572,1.408349 0.66954,1.569962 0.64645,2.077892 0.32323,2.170243 0.20779,2.147154 v 0.946596 h -8.14995 v 18.285447 h 6.71851 z",
+      // TODO: Adjust position values to match where this region appears on 19th.png
+      position: { top: "14.8%", left: "52.2%", width: "21.85%" },
+    },
+    {
+      id: "19th_2nd",
+      point: 2,
+      viewBox: "0 0 40.537605 53.194031",
+      transform: "translate(-67.835992,-25.488807)",
+      path: "M 108.35051,25.488806 H 89.349346 L 67.835993,62.751027 v 14.500371 h 20.358968 v 1.431438 H 108.3736 Z",
+      // TODO: Adjust position values to match where this region appears on 19th.png
+      position: { top: "21.2%", left: "45%", width: "7.3%" },
+    },
+    {
+      id: "19th_3rd",
+      point: 3,
+      viewBox: "0 0 31.676308 13.615387",
+      transform: "translate(-56.345498,-110.94788)",
+      path: "m 88.021804,110.94788 v 13.61538 H 56.345499 v -13.60384 z",
+      // TODO: Adjust position values to match where this region appears on 19th.png
+      position: { top: "44%", left: "43%", width: "5.6%" },
+    },
+    {
+      id: "19th_4th",
+      point: 4,
+      viewBox: "0 0 12.288028 32.080673",
+      transform: "translate(14.279734,-223.80049)",
+      path: "m -1.9917061,255.88117 v -30.65513 h -3.2977428 v -1.42555 h -8.9902851 v 32.08034 z",
+      // TODO: Adjust position values to match where this region appears on 19th.png
+      position: { top: "74.3%", left: "30.24%", width: "2.24%" },
+    },
+  ],
+},
+  // 20th floor config - copy this into your UNIT_PLAN_SVG_CONFIG
+
+"20th": {
+  totalPoints: 4,
+  regions: [
+    {
+      id: "20th_1st",
+      point: 1,
+      viewBox: "0 0 59.551178 10.392628",
+      transform: "translate(-111.09476,30.521934)",
+      path: "m 170.64595,-20.202756 v -6.326115 l -0.0857,-0.555067 -0.26121,-0.767297 -0.57955,-1.036666 -0.36733,-0.342834 -0.33467,-0.285697 -0.43119,-0.301316 -0.63491,-0.288594 -0.62337,-0.253965 -0.57719,-0.138526 -0.68109,-0.0231 h -50.55078 l -1.01218,0.10759 -0.63669,0.228555 -0.8979,0.424463 -0.66934,0.604042 -0.35917,0.473437 -0.42446,0.571392 -0.2612,0.636693 -0.16326,0.701995 v 6.644462 z",
+      // TODO: Adjust position values to match where this region appears on 20th.png
+      position: { top: "24.3%", left: "57.8%", width: "10.7%" },
+    },
+    {
+      id: "20th_2nd",
+      point: 2,
+      viewBox: "0 0 40.368641 53.211979",
+      transform: "translate(-39.52612,42.129889)",
+      path: "M 79.89476,-42.129889 V 11.082089 H 59.704758 V -4.5713618 H 39.52612 l 0.04617,-0.4155784 21.429897,-37.1176708 z",
+      // TODO: Adjust position values to match where this region appears on 20th.png
+      position: { top: "21.2%", left: "45%", width: "7.3%" },
+    },
+    {
+      id: "20th_3rd",
+      point: 3,
+      viewBox: "0 0 40.34021 13.680737",
+      transform: "translate(-27.932862,-43.262469)",
+      path: "M 27.932861,43.327769 V 56.943204 H 68.273072 V 43.262467 Z",
+      // TODO: Adjust position values to match where this region appears on 20th.png
+      position: { top: "44%", left: "43%", width: "7.34%" },
+    },
+    {
+      id: "20th_4th",
+      point: 4,
+      viewBox: "0 0 13.950108 33.663116",
+      transform: "translate(44.405252,-154.60209)",
+      path: "m -30.455145,188.2652 v -30.59939 h -3.299052 V 154.6021 H -44.40525 v 33.6631 z",
+      // TODO: Adjust position values to match where this region appears on 20th.png
+      position: { top: "74%", left: "30%", width: "2.46%" },
+    },
+  ],
+},
 };
 
 // Single Unit Plan SVG Region Component
@@ -663,6 +791,9 @@ export default function FloorComparisonPanel({
     if (floor === 1) return "1st";
     if (floor === 2 || floor === 9) return "2nd-9th";
     if (floor === 16) return "16th";
+    if (floor === 18) return "18th";
+    if (floor === 19) return "19th";
+    if (floor === 20) return "20th";
     return "multiple";
   };
 
@@ -909,6 +1040,15 @@ export default function FloorComparisonPanel({
 
     if (floor === 16) {
       return `/floors-images/16th${suffix}.png`;
+    }
+    if (floor === 18) {
+      return `/floors-images/18th${suffix}.png`;
+    }
+    if (floor === 19) {
+      return `/floors-images/19th${suffix}.png`;
+    }
+    if (floor === 20) {
+      return `/floors-images/20th${suffix}.png`;
     }
 
     if (

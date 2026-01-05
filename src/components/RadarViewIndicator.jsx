@@ -28,7 +28,25 @@ const DIRECTION_MAP = {
     2: 137,    // Point 2 direction
     3: 90,    // Point 3 direction
     4: 55,     // Point 4 direction
-  }
+  },
+  "18th": {
+    1: 179,      // Point 1 direction
+    2: 137,    // Point 2 direction
+    3: 75,    // Point 3 direction
+    4: 65,     // Point 4 direction
+  },
+  "19th": {
+    1: 179,      // Point 1 direction
+    2: 137,    // Point 2 direction
+    3: 110,    // Point 3 direction
+    4: 65,     // Point 4 direction
+  },
+  "20th": {
+    1: 179,      // Point 1 direction
+    2: 137,    // Point 2 direction
+    3: 110,    // Point 3 direction
+    4: 65,    // Point 4 direction
+  },
 };
 
 // Position configuration for radar on each floor type's unit plan image
@@ -54,7 +72,22 @@ export const RADAR_POSITION_CONFIG = {
     top: "56%",
     left: "84%",
     width: "75%",
-  }
+  },
+  "18th": {
+    top: "56%",
+    left: "63.6%",
+    width: "75%",
+  },
+  "19th": {
+    top: "56%",
+    left: "64%",
+    width: "75%",
+  },
+  "20th": {
+    top: "56%",
+    left: "64%",
+    width: "75%",
+  },
 };
 
 // Get rotation angle based on point and floor type
